@@ -283,13 +283,19 @@ function triggerLevelUpModal(levelInfo) {
     const modal = document.getElementById("modal-level-up");
     const levelNameSpan = document.getElementById("modal-level-name");
     
-    levelNameSpan.textContent = levelInfo.name;
-    modal.classList.add("active");
-    
-    const closeBtn = document.getElementById("btn-close-modal");
-    closeBtn.onclick = () => {
-        modal.classList.remove("active");
-    };
+    if (levelNameSpan) {
+        levelNameSpan.textContent = levelInfo.name;
+    }
+    if (modal) {
+        modal.classList.add("active");
+        
+        const closeBtn = document.getElementById("btn-close-modal");
+        if (closeBtn) {
+            closeBtn.onclick = () => {
+                modal.classList.remove("active");
+            };
+        }
+    }
 }
 
 // --- Attach Real-Time Calculation Listeners ---
@@ -325,34 +331,49 @@ function setupCalculator() {
     const btnPrev = document.getElementById("btn-prev");
     const stepLines = document.querySelectorAll(".step-line");
     
+    if (!btnNext || !btnPrev) return;
+    
     btnNext.addEventListener("click", () => {
         if (currentStepIndex < totalSteps) {
             const currIndicator = document.querySelector(`.step-indicator[data-step="${currentStepIndex}"]`);
-            currIndicator.classList.remove("active");
-            currIndicator.classList.add("completed");
+            if (currIndicator) {
+                currIndicator.classList.remove("active");
+                currIndicator.classList.add("completed");
+            }
             
             if (stepLines[currentStepIndex - 1]) {
                 stepLines[currentStepIndex - 1].classList.add("completed");
             }
             
-            document.getElementById(`step-${currentStepIndex}`).classList.remove("active");
+            const stepEl = document.getElementById(`step-${currentStepIndex}`);
+            if (stepEl) {
+                stepEl.classList.remove("active");
+            }
             currentStepIndex++;
-            document.getElementById(`step-${currentStepIndex}`).classList.add("active");
+            const nextStepEl = document.getElementById(`step-${currentStepIndex}`);
+            if (nextStepEl) {
+                nextStepEl.classList.add("active");
+            }
             
             const nextIndicator = document.querySelector(`.step-indicator[data-step="${currentStepIndex}"]`);
-            nextIndicator.classList.add("active");
+            if (nextIndicator) {
+                nextIndicator.classList.add("active");
+            }
             
             btnPrev.removeAttribute("disabled");
             
             if (currentStepIndex === totalSteps) {
-                btnNext.innerHTML = `Complete <span class="material-symbols-rounded">check</span>`;
+                btnNext.innerHTML = `Complete <span class="material-symbols-rounded" aria-hidden="true">check</span>`;
             }
         } else {
             // Final step submit button click: Celebrate & redirect
             calculateFootprint(false);
             
             // Switch to Dashboard Tab
-            document.getElementById("tab-dashboard").click();
+            const dashboardTab = document.getElementById("tab-dashboard");
+            if (dashboardTab) {
+                dashboardTab.click();
+            }
             
             // Award calculation submit XP (once)
             if (state.unlockedBadges.length === 0) {
@@ -366,21 +387,31 @@ function setupCalculator() {
     btnPrev.addEventListener("click", () => {
         if (currentStepIndex > 1) {
             const nextIndicator = document.querySelector(`.step-indicator[data-step="${currentStepIndex}"]`);
-            nextIndicator.classList.remove("active");
+            if (nextIndicator) {
+                nextIndicator.classList.remove("active");
+            }
             
-            document.getElementById(`step-${currentStepIndex}`).classList.remove("active");
+            const stepEl = document.getElementById(`step-${currentStepIndex}`);
+            if (stepEl) {
+                stepEl.classList.remove("active");
+            }
             currentStepIndex--;
-            document.getElementById(`step-${currentStepIndex}`).classList.add("active");
+            const prevStepEl = document.getElementById(`step-${currentStepIndex}`);
+            if (prevStepEl) {
+                prevStepEl.classList.add("active");
+            }
             
             const currIndicator = document.querySelector(`.step-indicator[data-step="${currentStepIndex}"]`);
-            currIndicator.classList.remove("completed");
-            currIndicator.classList.add("active");
+            if (currIndicator) {
+                currIndicator.classList.remove("completed");
+                currIndicator.classList.add("active");
+            }
             
             if (stepLines[currentStepIndex - 1]) {
                 stepLines[currentStepIndex - 1].classList.remove("completed");
             }
             
-            btnNext.innerHTML = `Next <span class="material-symbols-rounded">arrow_forward</span>`;
+            btnNext.innerHTML = `Next <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>`;
             
             if (currentStepIndex === 1) {
                 btnPrev.setAttribute("disabled", "true");
@@ -643,27 +674,30 @@ function setupTracker() {
         });
     });
 
-    customForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const title = document.getElementById("custom-habit-title").value.trim();
-        const co2Val = parseFloat(document.getElementById("custom-habit-co2").value) || 1.0;
-        const category = document.getElementById("custom-habit-category").value;
-        const id = "custom_" + Date.now();
-        
-        const newHabit = {
-            id: id,
-            title: title,
-            category: category,
-            co2: co2Val,
-            xp: Math.round(co2Val * 5) + 5
-        };
-        
-        state.customHabits.push(newHabit);
-        saveState();
-        renderHabits(currentFilter);
-        customForm.reset();
-        addXP(10);
-    });
+    if (customForm) {
+        customForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const titleInput = document.getElementById("custom-habit-title");
+            const title = titleInput ? titleInput.value.trim() : "";
+            const co2Val = safeGetFloat("custom-habit-co2", 1.0);
+            const category = safeGetValue("custom-habit-category", "transport");
+            const id = "custom_" + Date.now();
+            
+            const newHabit = {
+                id: id,
+                title: title,
+                category: category,
+                co2: co2Val,
+                xp: Math.round(co2Val * 5) + 5
+            };
+            
+            state.customHabits.push(newHabit);
+            saveState();
+            renderHabits(currentFilter);
+            customForm.reset();
+            addXP(10);
+        });
+    }
 }
 
 function renderHabits(filter = "all") {
@@ -744,7 +778,8 @@ function toggleHabit(habit) {
         updateUIElements();
     }
     
-    renderHabits(document.querySelector(".filter-btn.active").getAttribute("data-filter"));
+    const activeFilterBtn = document.querySelector(".filter-btn.active");
+    renderHabits(activeFilterBtn ? activeFilterBtn.getAttribute("data-filter") : "all");
 }
 
 // --- Impact Simulator Logic ---
@@ -997,19 +1032,21 @@ function setupChatbot() {
     const suggestionChips = document.querySelectorAll(".suggestion-chip");
     const chatBadge = document.getElementById("chat-badge");
 
-    if (!triggerBtn) return;
+    if (!triggerBtn || !chatWindow) return;
 
     triggerBtn.addEventListener("click", () => {
         chatWindow.classList.toggle("active");
         if (chatWindow.classList.contains("active")) {
-            chatBadge.style.display = "none";
-            msgContainer.scrollTop = msgContainer.scrollHeight;
+            if (chatBadge) chatBadge.style.display = "none";
+            if (msgContainer) msgContainer.scrollTop = msgContainer.scrollHeight;
         }
     });
 
-    closeBtn.addEventListener("click", () => {
-        chatWindow.classList.remove("active");
-    });
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            chatWindow.classList.remove("active");
+        });
+    }
 
     suggestionChips.forEach(chip => {
         chip.addEventListener("click", () => {
@@ -1018,18 +1055,20 @@ function setupChatbot() {
         });
     });
 
-    inputForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const text = inputField.value.trim();
-        if (text) {
-            submitUserMessage(text);
-            inputField.value = "";
-        }
-    });
+    if (inputForm && inputField) {
+        inputForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const text = inputField.value.trim();
+            if (text) {
+                submitUserMessage(text);
+                inputField.value = "";
+            }
+        });
+    }
 
     setTimeout(() => {
-        if (!chatWindow.classList.contains("active") && state.calculatorResults.total === 0) {
-            chatBadge.style.display = "flex";
+        if (chatWindow && !chatWindow.classList.contains("active") && state.calculatorResults.total === 0) {
+            if (chatBadge) chatBadge.style.display = "flex";
         }
     }, 5000);
 }
