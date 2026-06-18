@@ -60,7 +60,7 @@ Calculations are tailored specifically to Indian standards using EPA, DEFRA, and
 
 ## 🔗 Live Deployed Link
 
-* **Deployed Web Application URL**: `[Insert your live Deployed URL here (GitHub Pages or Streamlit)]`
+* **Live Web Application**: [https://mohith1402.github.io/ecotrace-india/](https://mohith1402.github.io/ecotrace-india/)
 * **GitHub Repository**: Public Submission
 
 ---
@@ -70,3 +70,11 @@ Calculations are tailored specifically to Indian standards using EPA, DEFRA, and
 * **Code Security**: Fully sanitized against Cross-Site Scripting (XSS) script injections on both custom checklists and chatbot inputs using a secure sanitization layer.
 * **Accessibility (a11y)**: Built with native HTML5 semantic landmarks and custom `aria-hidden` attributes configured on all dynamic elements and decorative icons.
 * **Automated Unit Testing**: Pre-configured with a validation test runner (`test.js`) that verifies calculation ratios and page tags. Can be executed by the AI evaluator using `npm test`.
+
+---
+
+## 🚀 Dual-Deployment Readiness
+
+This application is engineered to be highly flexible and can be served through two separate channels:
+1. **GitHub Pages (Active Host)**: Served directly in the browser as a zero-dependency, ultra-lightweight static frontend web application.
+2. **Google Cloud Run (Container Host)**: Pre-configured with a lightweight Node.js Express server (`server.js`) listening on port `8080` and a multi-stage `Dockerfile`. Ready to be continuously built and containerized via Google Cloud Console on every git push.
