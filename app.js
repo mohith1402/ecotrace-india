@@ -11,12 +11,6 @@ function safeSetText(id, text) {
     return el;
 }
 
-function safeSetHTML(id, html) {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = html;
-    return el;
-}
-
 function safeGetValue(id, defaultValue = "") {
     const el = document.getElementById(id);
     return el ? el.value : defaultValue;
@@ -152,7 +146,11 @@ function setupThemeToggler() {
         body.classList.toggle("light-theme");
         
         const isLight = body.classList.contains("light-theme");
-        localStorage.setItem("ecotrace_theme", isLight ? "light" : "dark");
+        try {
+            localStorage.setItem("ecotrace_theme", isLight ? "light" : "dark");
+        } catch (e) {
+            console.warn("Storage write failed for theme toggle", e);
+        }
         
         // Update both button icons
         const iconName = isLight ? "dark_mode" : "light_mode";
@@ -168,7 +166,12 @@ function setupThemeToggler() {
 }
 
 function loadTheme() {
-    const savedTheme = localStorage.getItem("ecotrace_theme");
+    let savedTheme = null;
+    try {
+        savedTheme = localStorage.getItem("ecotrace_theme");
+    } catch (e) {
+        console.warn("Storage access denied for theme load", e);
+    }
     
     if (savedTheme === "light") {
         document.body.classList.add("light-theme");
@@ -560,17 +563,19 @@ function updateLiveMetrics() {
     // RESOLVED UI BUG: Draw ONE clean, pulsing forest icon inside the circle badge
     const treeBadgeContainer = document.getElementById("forest-tree-container");
     if (treeBadgeContainer) {
-        treeBadgeContainer.innerHTML = `<span class="material-symbols-rounded tree-icon fill-icon" aria-hidden="true">forest</span>`;
-        const iconSpan = treeBadgeContainer.querySelector("span");
-        if (iconSpan) {
-            if (total < 1.5) {
-                iconSpan.style.color = "var(--color-primary)";
-            } else if (total <= 2.5) {
-                iconSpan.style.color = "var(--color-warning)";
-            } else {
-                iconSpan.style.color = "var(--color-danger)";
-            }
+        treeBadgeContainer.textContent = "";
+        const iconSpan = document.createElement("span");
+        iconSpan.className = "material-symbols-rounded tree-icon fill-icon";
+        iconSpan.setAttribute("aria-hidden", "true");
+        iconSpan.textContent = "forest";
+        if (total < 1.5) {
+            iconSpan.style.color = "var(--color-primary)";
+        } else if (total <= 2.5) {
+            iconSpan.style.color = "var(--color-warning)";
+        } else {
+            iconSpan.style.color = "var(--color-danger)";
         }
+        treeBadgeContainer.appendChild(iconSpan);
     }
 
     // OPTIMIZED: Re-draw mini trees inside the forest-grid ONLY if the required count changes
@@ -579,7 +584,7 @@ function updateLiveMetrics() {
         const iconCount = Math.min(40, Math.ceil(treesNeeded / 5));
         if (state.currentForestIconCount !== iconCount) {
             state.currentForestIconCount = iconCount;
-            forestGrid.innerHTML = "";
+            forestGrid.textContent = "";
             
             for (let i = 0; i < iconCount; i++) {
                 const tree = document.createElement("span");
@@ -600,7 +605,11 @@ function updateLiveMetrics() {
             }
             
             if (iconCount === 0) {
-                forestGrid.innerHTML = `<span style="font-size:12px; color:var(--text-muted);">Forest offset empty.</span>`;
+                const emptySpan = document.createElement("span");
+                emptySpan.style.fontSize = "12px";
+                emptySpan.style.color = "var(--text-muted)";
+                emptySpan.textContent = "Forest offset empty.";
+                forestGrid.appendChild(emptySpan);
             }
         }
     }
@@ -634,14 +643,22 @@ function updateBenchmarkText(totalScore) {
         statusText.textContent = "Awaiting Calculations";
         comparisonText.textContent = "Fill in the Calculator questions to view benchmarks.";
     } else {
+        statusText.textContent = "";
+        const span = document.createElement("span");
         if (totalScore < 1.5) {
-            statusText.innerHTML = `<span class="text-gradient-success">Eco Champion!</span>`;
+            span.className = "text-gradient-success";
+            span.textContent = "Eco Champion!";
+            statusText.appendChild(span);
             comparisonText.textContent = `Excellent! Your footprint (${totalScore.toFixed(2)} t) is below the global target of 1.5 tonnes and cleaner than the Indian average (1.9 t).`;
         } else if (totalScore <= 2.2) {
-            statusText.innerHTML = `<span class="text-gradient-success">Average Indian</span>`;
+            span.className = "text-gradient-success";
+            span.textContent = "Average Indian";
+            statusText.appendChild(span);
             comparisonText.textContent = `Your footprint is close to the Indian average of 1.9 tonnes. Try adopting AC and transport habits to target a sustainable 1.2 tonnes.`;
         } else {
-            statusText.innerHTML = `<span class="text-gradient-danger">High Impact</span>`;
+            span.className = "text-gradient-danger";
+            span.textContent = "High Impact";
+            statusText.appendChild(span);
             comparisonText.textContent = `Your footprint (${totalScore.toFixed(2)} t) is above the Indian national average. Adopt public transit, local Mandi food, and solar options.`;
         }
     }
@@ -703,7 +720,7 @@ function setupTracker() {
 function renderHabits(filter = "all") {
     const container = document.getElementById("habit-list-container");
     if (!container) return;
-    container.innerHTML = "";
+    container.textContent = "";
     
     const allHabits = [...PRESET_HABITS, ...state.customHabits];
     
@@ -713,7 +730,11 @@ function renderHabits(filter = "all") {
     });
     
     if (filtered.length === 0) {
-        container.innerHTML = `<p class="section-sub text-center" style="padding: 20px;">No habits in this category.</p>`;
+        const noHabitsMsg = document.createElement("p");
+        noHabitsMsg.className = "section-sub text-center";
+        noHabitsMsg.style.padding = "20px";
+        noHabitsMsg.textContent = "No habits in this category.";
+        container.appendChild(noHabitsMsg);
         return;
     }
 
@@ -728,24 +749,52 @@ function renderHabits(filter = "all") {
         const catIcons = { transport: "directions_car", energy: "bolt", food: "restaurant", consumption: "shopping_bag" };
         const catIcon = catIcons[habit.category] || "eco";
         
-        const safeTitle = escapeHTML(habit.title);
-        const safeCategory = escapeHTML(habit.category);
+        const habitLeft = document.createElement("div");
+        habitLeft.className = "habit-left";
         
-        habitDiv.innerHTML = `
-            <div class="habit-left">
-                <div class="habit-checkbox">
-                    <span class="material-symbols-rounded">check</span>
-                </div>
-                <div class="habit-details">
-                    <h4>${safeTitle}</h4>
-                    <span class="habit-tag"><span class="material-symbols-rounded">${catIcon}</span> ${safeCategory}</span>
-                </div>
-            </div>
-            <div class="habit-right">
-                <span class="co2-offset">-${habit.co2} kg CO₂</span>
-                <span class="xp-gain">+${habit.xp} XP</span>
-            </div>
-        `;
+        const habitCheckbox = document.createElement("div");
+        habitCheckbox.className = "habit-checkbox";
+        const checkIcon = document.createElement("span");
+        checkIcon.className = "material-symbols-rounded";
+        checkIcon.setAttribute("aria-hidden", "true");
+        checkIcon.textContent = "check";
+        habitCheckbox.appendChild(checkIcon);
+        habitLeft.appendChild(habitCheckbox);
+        
+        const habitDetails = document.createElement("div");
+        habitDetails.className = "habit-details";
+        
+        const h4 = document.createElement("h4");
+        h4.textContent = habit.title;
+        habitDetails.appendChild(h4);
+        
+        const habitTag = document.createElement("span");
+        habitTag.className = "habit-tag";
+        const tagIcon = document.createElement("span");
+        tagIcon.className = "material-symbols-rounded";
+        tagIcon.setAttribute("aria-hidden", "true");
+        tagIcon.textContent = catIcon;
+        habitTag.appendChild(tagIcon);
+        habitTag.appendChild(document.createTextNode(" " + habit.category));
+        habitDetails.appendChild(habitTag);
+        
+        habitLeft.appendChild(habitDetails);
+        habitDiv.appendChild(habitLeft);
+        
+        const habitRight = document.createElement("div");
+        habitRight.className = "habit-right";
+        
+        const co2Offset = document.createElement("span");
+        co2Offset.className = "co2-offset";
+        co2Offset.textContent = `-${habit.co2} kg CO₂`;
+        habitRight.appendChild(co2Offset);
+        
+        const xpGain = document.createElement("span");
+        xpGain.className = "xp-gain";
+        xpGain.textContent = `+${habit.xp} XP`;
+        habitRight.appendChild(xpGain);
+        
+        habitDiv.appendChild(habitRight);
         
         habitDiv.addEventListener("click", () => {
             toggleHabit(habit);
@@ -804,7 +853,7 @@ function updateSimulationPathway() {
     const reduceFoodSlider = document.getElementById("sim-food");
     const reduceWasteSlider = document.getElementById("sim-waste");
     
-    if (!reduceCarSlider) return;
+    if (!reduceCarSlider || !reduceEnergySlider || !reduceFoodSlider || !reduceWasteSlider) return;
 
     const reduceCar = parseFloat(reduceCarSlider.value) / 100;
     const reduceEnergy = parseFloat(reduceEnergySlider.value) / 100;
@@ -860,18 +909,27 @@ function updateUIElements() {
     // Achievements Badge Rendering
     const badgesGrid = document.getElementById("badges-grid");
     if (badgesGrid) {
-        badgesGrid.innerHTML = "";
+        badgesGrid.textContent = "";
         ACHIEVEMENT_BADGES.forEach(badge => {
             const isUnlocked = state.unlockedBadges.includes(badge.id);
             const badgeItem = document.createElement("div");
             badgeItem.className = `badge-item ${badge.gold ? "gold" : ""} ${isUnlocked ? "unlocked" : ""}`;
             badgeItem.title = badge.desc;
-            badgeItem.innerHTML = `
-                <div class="badge-circle">
-                    <span class="material-symbols-rounded" aria-hidden="true">${badge.icon}</span>
-                </div>
-                <span class="badge-title">${badge.title}</span>
-            `;
+            
+            const badgeCircle = document.createElement("div");
+            badgeCircle.className = "badge-circle";
+            const badgeIcon = document.createElement("span");
+            badgeIcon.className = "material-symbols-rounded";
+            badgeIcon.setAttribute("aria-hidden", "true");
+            badgeIcon.textContent = badge.icon;
+            badgeCircle.appendChild(badgeIcon);
+            
+            const badgeTitle = document.createElement("span");
+            badgeTitle.className = "badge-title";
+            badgeTitle.textContent = badge.title;
+            
+            badgeItem.appendChild(badgeCircle);
+            badgeItem.appendChild(badgeTitle);
             badgesGrid.appendChild(badgeItem);
         });
     }
@@ -1084,32 +1142,51 @@ function submitUserMessage(text) {
     }, 1200);
 }
 
+function renderMessageContent(element, text) {
+    element.textContent = "";
+    const parts = text.split(/\*\*([^*]+)\*\*/g);
+    for (let i = 0; i < parts.length; i++) {
+        if (i % 2 === 1) {
+            const strong = document.createElement("strong");
+            const subparts = parts[i].split("\n");
+            for (let j = 0; j < subparts.length; j++) {
+                if (j > 0) strong.appendChild(document.createElement("br"));
+                strong.appendChild(document.createTextNode(subparts[j]));
+            }
+            element.appendChild(strong);
+        } else {
+            const subparts = parts[i].split("\n");
+            for (let j = 0; j < subparts.length; j++) {
+                if (j > 0) element.appendChild(document.createElement("br"));
+                element.appendChild(document.createTextNode(subparts[j]));
+            }
+        }
+    }
+}
+
 function appendMessage(sender, text) {
     const container = document.getElementById("chat-messages-container");
+    if (!container) return;
     const bubble = document.createElement("div");
     bubble.className = `chat-bubble ${sender}`;
     
-    // Securely escape HTML characters to prevent script injection (XSS),
-    // and safely parse basic markdown bold formatting and line breaks.
-    let safeText = escapeHTML(text);
-    safeText = safeText.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-    safeText = safeText.replace(/\n/g, "<br>");
-    
-    bubble.innerHTML = safeText;
+    renderMessageContent(bubble, text);
     container.appendChild(bubble);
     container.scrollTop = container.scrollHeight;
 }
 
 function showTypingIndicator() {
     const container = document.getElementById("chat-messages-container");
+    if (!container) return;
     const indicator = document.createElement("div");
     indicator.className = "chat-bubble bot loading";
     indicator.id = "chat-typing-indicator";
-    indicator.innerHTML = `
-        <span class="typing-dot"></span>
-        <span class="typing-dot"></span>
-        <span class="typing-dot"></span>
-    `;
+    
+    for (let i = 0; i < 3; i++) {
+        const dot = document.createElement("span");
+        dot.className = "typing-dot";
+        indicator.appendChild(dot);
+    }
     container.appendChild(indicator);
     container.scrollTop = container.scrollHeight;
 }
@@ -1171,24 +1248,24 @@ function generateAIResponse(query) {
         }
         
         let response = `⚡ **Energy & Cooking Footprint**: **${results.energy.toFixed(2)} tonnes CO₂e/yr**.\n\n`;
-        const regionalGrid = document.getElementById("regional-grid").value;
+        const regionalGrid = safeGetValue("regional-grid", "west");
         const gridNames = { north: "Northern Grid", south: "Southern Grid", west: "Western Grid", east: "Eastern Grid", northeast: "North-Eastern Grid" };
         
-        response += `• You are mapped to the **${gridNames[regionalGrid]}**.\n`;
+        response += `• You are mapped to the **${gridNames[regionalGrid] || "Western Grid"}**.\n`;
         if (regionalGrid === "north" || regionalGrid === "east" || regionalGrid === "west") {
             response += `⚠️ Note: Your region relies heavily on coal power. Reducing electricity use or opting for rooftop solar will have a MASSIVE positive impact here!\n`;
         } else {
             response += `🌱 Note: Your grid region is comparatively cleaner, but conservation remains vital.\n`;
         }
         
-        const solar = document.getElementById("solar-energy").checked;
+        const solar = safeGetChecked("solar-energy", false);
         if (solar) {
             response += `• ☀️ Rooftop Solar is active! Excellent choice, it offsets 85% of your electricity carbon load.\n`;
         } else {
             response += `• ☀️ No Solar detected. Shifting to solar power can reduce your home footprint immediately.\n`;
         }
 
-        const lpg = parseFloat(document.getElementById("lpg-cylinders").value) || 0;
+        const lpg = safeGetFloat("lpg-cylinders", 0);
         if (lpg > 1.5) {
             response += `• 🍳 LPG consumption is high (${lpg} cylinders/mo). Consider energy-efficient induction cooktops powered by green energy.`;
         }
@@ -1203,8 +1280,8 @@ function generateAIResponse(query) {
         }
         
         let response = `🚗 **Transportation Footprint**: **${results.transport.toFixed(2)} tonnes CO₂e/yr**.\n\n`;
-        const carDist = parseFloat(document.getElementById("car-distance").value) || 0;
-        const bikeDist = parseFloat(document.getElementById("bike-distance").value) || 0;
+        const carDist = safeGetFloat("car-distance", 0);
+        const bikeDist = safeGetFloat("bike-distance", 0);
         
         if (carDist > 6000) {
             response += `• Private car travel is high (${carDist} km/yr). Swap some trips for Metro or carpool options.\n`;
@@ -1224,7 +1301,8 @@ function generateAIResponse(query) {
         }
         
         let response = `🥗 **Diet & Food Footprint**: **${(results.food * 1000).toFixed(0)} kg CO₂e/yr**.\n\n`;
-        const diet = document.querySelector('input[name="diet"]:checked').value;
+        const dietRadio = document.querySelector('input[name="diet"]:checked');
+        const diet = dietRadio ? dietRadio.value : "pure-veg";
         
         if (diet === "pure-veg") {
             response += `• 🌱 You maintain a **Pure Veg** diet. Excellent! This is one of the lowest agricultural footprints globally.\n`;
@@ -1234,7 +1312,7 @@ function generateAIResponse(query) {
             response += `• 🍗 Moderate to heavy non-vegetarian choices represent higher agricultural emissions. Swapping mutton or poultry for plant-based days saves up to 5.4 kg CO2 per day!\n`;
         }
 
-        const waste = document.getElementById("food-waste").value;
+        const waste = safeGetValue("food-waste", "normal");
         if (waste === "high") {
             response += `• ⚠️ High food waste creates landfill methane. Composting organic waste can offset this.`;
         }

@@ -112,7 +112,7 @@
         <!-- 2. RIGHT MAIN CONTENT PANEL -->
         <main class="main-content">
             <!-- CALCULATOR PANEL -->
-            <section class="panel active" id="panel-calculator">
+            <section class="panel active" id="panel-calculator" role="tabpanel" aria-labelledby="tab-calculator">
                 <div class="panel-header">
                     <h2>Emissions Calculator</h2>
                     <p>Enter your daily routines, household energy, and food details. Your carbon score is recalculated in real-time as you type.</p>
@@ -326,10 +326,10 @@
                         <!-- Navigation Footer -->
                         <div class="calc-nav">
                             <button type="button" class="btn btn-secondary btn-icon-left" id="btn-prev" disabled>
-                                <span class="material-symbols-rounded">arrow_back</span> Back
+                                <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span> Back
                             </button>
                             <button type="button" class="btn btn-primary btn-icon-right" id="btn-next">
-                                Next <span class="material-symbols-rounded">arrow_forward</span>
+                                Next <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
                             </button>
                         </div>
                     </form>
@@ -337,7 +337,7 @@
             </section>
 
             <!-- DASHBOARD PANEL -->
-            <section class="panel" id="panel-dashboard">
+            <section class="panel" id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard">
                 <div class="panel-header">
                     <h2>Footprint Analytics</h2>
                     <p>Real-time analytics comparing your carbon footprint against Indian national benchmarks.</p>
@@ -385,7 +385,7 @@
                         <h3>Forest Carbon Offset</h3>
                         <div class="tree-offset-showcase">
                             <div class="forest-visualization" id="forest-tree-container">
-                                <span class="material-symbols-rounded tree-icon fill-icon" id="primary-visual-tree">forest</span>
+                                <span class="material-symbols-rounded tree-icon fill-icon" id="primary-visual-tree" aria-hidden="true">forest</span>
                             </div>
                             <div class="forest-stats">
                                 <h4 class="text-gradient-success"><span id="display-trees-count">0</span> Trees Required</h4>
@@ -396,7 +396,7 @@
                         <div class="forest-grid" id="forest-grid"></div>
                         
                         <div class="savings-note" id="trees-saved-box" style="display: none; margin-top: 14px;">
-                            <span class="material-symbols-rounded">park</span>
+                            <span class="material-symbols-rounded" aria-hidden="true">park</span>
                             <span>Your Action Center savings equal **<span id="display-trees-saved">0</span> saplings** saved!</span>
                         </div>
                     </div>
@@ -412,7 +412,7 @@
             </section>
 
             <!-- TRACKER PANEL -->
-            <section class="panel" id="panel-tracker">
+            <section class="panel" id="panel-tracker" role="tabpanel" aria-labelledby="tab-tracker">
                 <div class="panel-header">
                     <h2>Daily Action Center</h2>
                     <p>Complete daily carbon reduction tasks, log actual savings, and gain XP to level up.</p>
@@ -422,14 +422,14 @@
                     <!-- Lifetime Offset Stats -->
                     <div class="glass-card offset-stats-card flex-row">
                         <div class="stat-item">
-                            <span class="material-symbols-rounded text-large text-gradient-success fill-icon">public</span>
+                            <span class="material-symbols-rounded text-large text-gradient-success fill-icon" aria-hidden="true">public</span>
                             <div>
                                 <span class="stat-number" id="stats-lifetime-saved">0.0</span>
                                 <span class="stat-label">Total CO₂ Saved (kg)</span>
                             </div>
                         </div>
                         <div class="stat-item border-left">
-                            <span class="material-symbols-rounded text-large text-gradient-success fill-icon">military_tech</span>
+                            <span class="material-symbols-rounded text-large text-gradient-success fill-icon" aria-hidden="true">military_tech</span>
                             <div>
                                 <span class="stat-number" id="stats-total-xp">0</span>
                                 <span class="stat-label">Total XP Earned</span>
@@ -481,7 +481,7 @@
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-block">
-                                    <span class="material-symbols-rounded">add</span> Add Action
+                                    <span class="material-symbols-rounded" aria-hidden="true">add</span> Add Action
                                 </button>
                             </form>
                         </div>
@@ -490,7 +490,7 @@
             </section>
 
             <!-- SIMULATOR PANEL -->
-            <section class="panel" id="panel-simulator">
+            <section class="panel" id="panel-simulator" role="tabpanel" aria-labelledby="tab-simulator">
                 <div class="panel-header">
                     <h2>Net-Zero Simulator</h2>
                     <p>Model custom changes in your energy, travel, and food profiles to project a 5-year pathway to carbon neutrality.</p>
@@ -504,7 +504,7 @@
                         
                         <div class="slider-group">
                             <div class="slider-header">
-                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">commute</span> Reduce Driving (Car/Bike)</span>
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">commute</span> Reduce Driving (Car/Bike)</span>
                                 <span class="slider-value" id="sim-car-val">0%</span>
                             </div>
                             <input type="range" id="sim-car" min="0" max="100" value="0" class="sim-slider" aria-label="Reduce Driving (Car/Bike) percentage">
@@ -513,7 +513,7 @@
 
                         <div class="slider-group">
                             <div class="slider-header">
-                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">solar_power</span> Switch to Clean Power</span>
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">solar_power</span> Switch to Clean Power</span>
                                 <span class="slider-value" id="sim-energy-val">0%</span>
                             </div>
                             <input type="range" id="sim-energy" min="0" max="100" value="0" class="sim-slider" aria-label="Switch to Clean Power percentage">
@@ -522,7 +522,7 @@
 
                         <div class="slider-group">
                             <div class="slider-header">
-                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">potted_plant</span> Plant-Based Diet Adoption</span>
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">potted_plant</span> Plant-Based Diet Adoption</span>
                                 <span class="slider-value" id="sim-food-val">0%</span>
                             </div>
                             <input type="range" id="sim-food" min="0" max="100" value="0" class="sim-slider" aria-label="Plant-Based Diet Adoption percentage">
@@ -531,7 +531,7 @@
 
                         <div class="slider-group">
                             <div class="slider-header">
-                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">delete_sweep</span> Waste Minimization</span>
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">delete_sweep</span> Waste Minimization</span>
                                 <span class="slider-value" id="sim-waste-val">0%</span>
                             </div>
                             <input type="range" id="sim-waste" min="0" max="100" value="0" class="sim-slider" aria-label="Waste Minimization percentage">
@@ -550,12 +550,12 @@
                                 <span class="metric-lbl">Current Footprint</span>
                                 <span class="metric-val" id="sim-current-val">0.00 t</span>
                             </div>
-                            <div class="sim-arrow"><span class="material-symbols-rounded">arrow_forward</span></div>
+                            <div class="sim-arrow"><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></div>
                             <div class="sim-metric text-success">
                                 <span class="metric-lbl">Year 5 Target</span>
                                 <span class="metric-val" id="sim-target-val">0.00 t</span>
                             </div>
-                            <div class="sim-arrow"><span class="material-symbols-rounded">arrow_forward</span></div>
+                            <div class="sim-arrow"><span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></div>
                             <div class="sim-metric text-info">
                                 <span class="metric-lbl">Emissions Reduction</span>
                                 <span class="metric-val" id="sim-reduction-val">0%</span>
@@ -571,7 +571,7 @@
     <div class="modal-overlay" id="modal-level-up">
         <div class="glass-card modal-card animate-zoom" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div class="modal-icon-badge">
-                <span class="material-symbols-rounded text-large fill-icon">military_tech</span>
+                <span class="material-symbols-rounded text-large fill-icon" aria-hidden="true">military_tech</span>
             </div>
             <h2 id="modal-title">Level Up!</h2>
             <p>Outstanding! Your carbon-saving habits have unlocked a new rank.</p>
@@ -582,7 +582,7 @@
 
     <!-- EcoBuddy Chat Widget UI -->
     <button id="chat-trigger-btn" class="chat-trigger-btn" aria-label="Open EcoBuddy Chatbot">
-        <span class="material-symbols-rounded fill-icon">smart_toy</span>
+        <span class="material-symbols-rounded fill-icon" aria-hidden="true">smart_toy</span>
         <span class="chat-badge" id="chat-badge" style="display: none;">1</span>
     </button>
 
@@ -596,7 +596,7 @@
                 </div>
             </div>
             <button id="chat-close-btn" class="chat-close-btn" aria-label="Close Chat">
-                <span class="material-symbols-rounded">close</span>
+                <span class="material-symbols-rounded" aria-hidden="true">close</span>
             </button>
         </div>
 
@@ -616,7 +616,7 @@
         <form id="chat-input-form" class="chat-input-area" onsubmit="event.preventDefault();">
             <input type="text" id="chat-input-field" placeholder="Ask EcoBuddy about your emissions..." autocomplete="off" aria-label="EcoBuddy message input">
             <button type="submit" id="chat-send-btn" class="chat-send-btn" aria-label="Send message">
-                <span class="material-symbols-rounded">send</span>
+                <span class="material-symbols-rounded" aria-hidden="true">send</span>
             </button>
         </form>
     </div>
