@@ -123,18 +123,22 @@ function escapeHTML(str) {
 
 // --- Local Storage Management ---
 function saveState() {
-    localStorage.setItem("ecotrace_state_in_saas", JSON.stringify(state));
+    try {
+        localStorage.setItem("ecotrace_state_in_saas", JSON.stringify(state));
+    } catch (e) {
+        console.warn("Storage write failed", e);
+    }
 }
 
 function loadState() {
-    const saved = localStorage.getItem("ecotrace_state_in_saas");
-    if (saved) {
-        try {
+    try {
+        const saved = localStorage.getItem("ecotrace_state_in_saas");
+        if (saved) {
             const parsed = JSON.parse(saved);
             state = { ...state, ...parsed };
-        } catch (e) {
-            console.error("Error loading state", e);
         }
+    } catch (e) {
+        console.warn("Storage read failed", e);
     }
 }
 
@@ -847,127 +851,139 @@ function updateUIElements() {
 
 // --- Chart.js Integration System ---
 function initCharts() {
-    const breakdownCanvas = document.getElementById("breakdownChart");
-    if (!breakdownCanvas) return;
-    
-    // Read active theme to apply correct text colors to labels
-    const isLight = document.body.classList.contains("light-theme");
-    const labelColor = isLight ? "#475569" : "#64748b";
-    
-    const breakdownCtx = breakdownCanvas.getContext("2d");
-    breakdownChart = new Chart(breakdownCtx, {
-        type: "doughnut",
-        data: {
-            labels: ["Transport", "Home Energy", "Diet & Food", "Consumption"],
-            datasets: [{
-                data: [0, 0, 0, 0],
-                backgroundColor: [
-                    "#10b981",  // Emerald Green
-                    "#0d9488",  // Teal
-                    "#34d399",  // Mint
-                    "#f59e0b"   // Amber
-                ],
-                borderWidth: 2,
-                borderColor: isLight ? "#ffffff" : "#06080d",
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins: {
-                legend: {
-                    position: "bottom",
-                    labels: {
-                        color: labelColor,
-                        font: { family: "Outfit", size: 11 }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return ` ${context.label}: ${context.raw.toFixed(2)} tonnes CO₂`;
+    try {
+        const breakdownCanvas = document.getElementById("breakdownChart");
+        if (!breakdownCanvas) return;
+        
+        // Read active theme to apply correct text colors to labels
+        const isLight = document.body.classList.contains("light-theme");
+        const labelColor = isLight ? "#475569" : "#64748b";
+        
+        const breakdownCtx = breakdownCanvas.getContext("2d");
+        breakdownChart = new Chart(breakdownCtx, {
+            type: "doughnut",
+            data: {
+                labels: ["Transport", "Home Energy", "Diet & Food", "Consumption"],
+                datasets: [{
+                    data: [0, 0, 0, 0],
+                    backgroundColor: [
+                        "#10b981",  // Emerald Green
+                        "#0d9488",  // Teal
+                        "#34d399",  // Mint
+                        "#f59e0b"   // Amber
+                    ],
+                    borderWidth: 2,
+                    borderColor: isLight ? "#ffffff" : "#06080d",
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            color: labelColor,
+                            font: { family: "Outfit", size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${context.raw.toFixed(2)} tonnes CO₂`;
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
 
-    const projectionCanvas = document.getElementById("projectionChart");
-    if (!projectionCanvas) return;
-    
-    const gridColor = isLight ? "rgba(15, 23, 42, 0.05)" : "rgba(255, 255, 255, 0.03)";
-    const projectionCtx = projectionCanvas.getContext("2d");
-    const chartGradient = projectionCtx.createLinearGradient(0, 0, 0, 300);
-    chartGradient.addColorStop(0, "rgba(16, 185, 129, 0.25)");
-    chartGradient.addColorStop(1, "rgba(16, 185, 129, 0.0)");
+        const projectionCanvas = document.getElementById("projectionChart");
+        if (!projectionCanvas) return;
+        
+        const gridColor = isLight ? "rgba(15, 23, 42, 0.05)" : "rgba(255, 255, 255, 0.03)";
+        const projectionCtx = projectionCanvas.getContext("2d");
+        const chartGradient = projectionCtx.createLinearGradient(0, 0, 0, 300);
+        chartGradient.addColorStop(0, "rgba(16, 185, 129, 0.25)");
+        chartGradient.addColorStop(1, "rgba(16, 185, 129, 0.0)");
 
-    projectionChart = new Chart(projectionCtx, {
-        type: "line",
-        data: {
-            labels: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
-            datasets: [{
-                label: "Simulated Emissions",
-                data: [0, 0, 0, 0, 0],
-                borderColor: "#10b981",
-                borderWidth: 3,
-                pointBackgroundColor: "#10b981",
-                pointBorderColor: isLight ? "#f8fafc" : "#06080d",
-                pointBorderWidth: 2,
-                pointRadius: 4,
-                pointHoverRadius: 6,
-                fill: true,
-                backgroundColor: chartGradient,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: false,
-            plugins: {
-                legend: { display: false }
+        projectionChart = new Chart(projectionCtx, {
+            type: "line",
+            data: {
+                labels: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
+                datasets: [{
+                    label: "Simulated Emissions",
+                    data: [0, 0, 0, 0, 0],
+                    borderColor: "#10b981",
+                    borderWidth: 3,
+                    pointBackgroundColor: "#10b981",
+                    pointBorderColor: isLight ? "#f8fafc" : "#06080d",
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    fill: true,
+                    backgroundColor: chartGradient,
+                    tension: 0.3
+                }]
             },
-            scales: {
-                y: {
-                    grid: { color: gridColor },
-                    ticks: {
-                        color: labelColor,
-                        font: { family: "Outfit", size: 10 },
-                        callback: function(value) { return value + " t"; }
-                    }
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    legend: { display: false }
                 },
-                x: {
-                    grid: { display: false },
-                    ticks: {
-                        color: labelColor,
-                        font: { family: "Outfit", size: 10 }
+                scales: {
+                    y: {
+                        grid: { color: gridColor },
+                        ticks: {
+                            color: labelColor,
+                            font: { family: "Outfit", size: 10 },
+                            callback: function(value) { return value + " t"; }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: {
+                            color: labelColor,
+                            font: { family: "Outfit", size: 10 }
+                        }
                     }
                 }
             }
-        }
-    });
+        });
 
-    updateDashboardCharts();
-    updateSimulatorCharts();
+        updateDashboardCharts();
+        updateSimulatorCharts();
+    } catch (e) {
+        console.warn("Chart initialization failed", e);
+    }
 }
 
 function updateDashboardCharts() {
-    if (breakdownChart) {
-        breakdownChart.data.datasets[0].data = [
-            state.calculatorResults.transport,
-            state.calculatorResults.energy,
-            state.calculatorResults.food,
-            state.calculatorResults.consumption
-        ];
-        breakdownChart.update();
+    try {
+        if (breakdownChart) {
+            breakdownChart.data.datasets[0].data = [
+                state.calculatorResults.transport,
+                state.calculatorResults.energy,
+                state.calculatorResults.food,
+                state.calculatorResults.consumption
+            ];
+            breakdownChart.update();
+        }
+    } catch (e) {
+        console.warn("Dashboard chart update failed", e);
     }
 }
 
 function updateSimulatorCharts() {
-    updateSimulationPathway();
+    try {
+        updateSimulationPathway();
+    } catch (e) {
+        console.warn("Simulator chart update failed", e);
+    }
 }
 
 // --- EcoBuddy AI Assistant Chatbot Engine ---

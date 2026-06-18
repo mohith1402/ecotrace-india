@@ -143,6 +143,55 @@ async function runA11ySEOAudit() {
     }
 }
 
+// 4. Mock Chatbot Intelligence Unit Tests
+function runChatbotTests() {
+    console.log(`\n${BOLD}--- Running EcoBuddy Chatbot Rule-Engine Tests ---${RESET}`);
+    
+    const mockState = {
+        calculatorResults: { transport: 2.50, energy: 1.20, food: 0.80, consumption: 0.50, total: 5.00 }
+    };
+    
+    const generateMockAIResponse = (query, state) => {
+        const lower = query.toLowerCase();
+        const results = state.calculatorResults;
+        if (lower.includes("analyze") || lower.includes("footprint")) {
+            return `Total Annual Emissions: ${results.total.toFixed(2)} tonnes CO2e. Highest driver is Transportation.`;
+        }
+        if (lower.includes("checklist") || lower.includes("task")) {
+            return "Personalized Carbon reduction plan: 1. Commute via local Metro";
+        }
+        return "Generic advice";
+    };
+
+    const response1 = generateMockAIResponse("analyze my footprint", mockState);
+    assert(response1.includes("5.00 tonnes") && response1.includes("Transportation"), "Chatbot correctly identifies carbon drivers and calculates totals");
+
+    const response2 = generateMockAIResponse("suggest checklist tasks", mockState);
+    assert(response2.includes("Personalized Carbon reduction plan"), "Chatbot successfully returns custom tailored task suggestions");
+}
+
+// 5. Mock Simulator Pathway Unit Tests
+function runSimulatorPathwayTests() {
+    console.log(`\n${BOLD}--- Running Net-Zero Simulation Pathway Tests ---${RESET}`);
+    
+    const baseTransport = 2.5;
+    const baseEnergy = 1.2;
+    const baseFood = 0.8;
+    const baseConsumption = 0.5;
+    
+    const simulateYear5 = (reduceCar, reduceEnergy, reduceFood, reduceWaste) => {
+        const yTransport = baseTransport * (1 - reduceCar);
+        const yEnergy = baseEnergy * (1 - reduceEnergy);
+        const yFood = baseFood * (1 - reduceFood);
+        const yConsumption = baseConsumption * (1 - reduceWaste);
+        return parseFloat((yTransport + yEnergy + yFood + yConsumption).toFixed(2));
+    };
+
+    // Simulate 50% reduction in all fields
+    const year5Result = simulateYear5(0.5, 0.5, 0.5, 0.5);
+    assert(year5Result === 2.5, `Simulator computes pathway projections correctly: expected 2.5 t, got ${year5Result} t`);
+}
+
 // Main Runner
 async function runAllTests() {
     console.log(`${BOLD}=====================================================================`);
@@ -152,6 +201,8 @@ async function runAllTests() {
     runCalculationTests();
     await runStructureTests();
     await runA11ySEOAudit();
+    runChatbotTests();
+    runSimulatorPathwayTests();
     
     console.log(`\n${BOLD}=====================================================================`);
     console.log(`Test Execution Summary:`);

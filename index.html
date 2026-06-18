@@ -29,12 +29,12 @@
             <div class="sidebar-top">
                 <div class="logo-area">
                     <div class="logo-brand">
-                        <span class="material-symbols-rounded fill-icon text-gradient-success">eco</span>
+                        <span class="material-symbols-rounded fill-icon text-gradient-success" aria-hidden="true">eco</span>
                         <h2>EcoTrace</h2>
                     </div>
                     <!-- Theme Toggle Switch -->
                     <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
-                        <span class="material-symbols-rounded" id="theme-icon">light_mode</span>
+                        <span class="material-symbols-rounded" id="theme-icon" aria-hidden="true">light_mode</span>
                     </button>
                 </div>
                 
@@ -46,7 +46,7 @@
                         <span class="widget-unit">t CO₂/yr</span>
                     </div>
                     <div class="widget-indicator success" id="sidebar-trend-indicator">
-                        <span class="material-symbols-rounded">check_circle</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
                         <span id="trend-text">Awaiting input</span>
                     </div>
                 </div>
@@ -54,19 +54,19 @@
                 <!-- Navigation Tabs -->
                 <nav class="nav-menu" role="tablist" aria-label="Main Navigation">
                     <button class="nav-menu-btn active" data-tab="calculator" id="tab-calculator" role="tab" aria-selected="true">
-                        <span class="material-symbols-rounded">calculate</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">calculate</span>
                         <span>Calculator</span>
                     </button>
                     <button class="nav-menu-btn" data-tab="dashboard" id="tab-dashboard" role="tab" aria-selected="false">
-                        <span class="material-symbols-rounded">dashboard</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">dashboard</span>
                         <span>Dashboard</span>
                     </button>
                     <button class="nav-menu-btn" data-tab="tracker" id="tab-tracker" role="tab" aria-selected="false">
-                        <span class="material-symbols-rounded">checklist</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">checklist</span>
                         <span>Action Center</span>
                     </button>
                     <button class="nav-menu-btn" data-tab="simulator" id="tab-simulator" role="tab" aria-selected="false">
-                        <span class="material-symbols-rounded">query_stats</span>
+                        <span class="material-symbols-rounded" aria-hidden="true">query_stats</span>
                         <span>Simulator</span>
                     </button>
                 </nav>
@@ -92,7 +92,7 @@
         <!-- Mobile Header Toggle Bar -->
         <header class="mobile-header">
             <div class="logo-area">
-                <span class="material-symbols-rounded fill-icon text-gradient-success">eco</span>
+                <span class="material-symbols-rounded fill-icon text-gradient-success" aria-hidden="true">eco</span>
                 <h2>EcoTrace</h2>
             </div>
             <div class="mobile-menu-actions">
@@ -101,10 +101,10 @@
                 </div>
                 <!-- Mobile Theme Toggle -->
                 <button id="mobile-theme-toggle-btn" class="mobile-theme-btn" aria-label="Toggle Light/Dark Theme">
-                    <span class="material-symbols-rounded" id="mobile-theme-icon">light_mode</span>
+                    <span class="material-symbols-rounded" id="mobile-theme-icon" aria-hidden="true">light_mode</span>
                 </button>
                 <button id="mobile-menu-trigger" class="mobile-menu-btn" aria-label="Open navigation menu">
-                    <span class="material-symbols-rounded">menu</span>
+                    <span class="material-symbols-rounded" aria-hidden="true">menu</span>
                 </button>
             </div>
         </header>
@@ -135,7 +135,7 @@
                     <form id="footprint-form" onsubmit="event.preventDefault();">
                         <!-- STEP 1: TRANSPORT -->
                         <div class="calc-step active" data-step="1" id="step-1">
-                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">directions_car</span> Transportation</h3>
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">directions_car</span> Transportation</h3>
                             <p class="step-desc">Specify your commute metrics. Private car driving, two-wheeler travel, and public transit comprise transport emissions.</p>
                             
                             <div class="form-grid">
@@ -190,7 +190,7 @@
 
                         <!-- STEP 2: ENERGY -->
                         <div class="calc-step" data-step="2" id="step-2">
-                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">bolt</span> Energy & LPG Cooking</h3>
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">bolt</span> Energy & LPG Cooking</h3>
                             <p class="step-desc">Electricity carbon intensity varies by Indian regional grids. LPG cooking cylinders are also a key component.</p>
                             
                             <div class="form-grid">
@@ -231,7 +231,7 @@
 
                         <!-- STEP 3: FOOD -->
                         <div class="calc-step" data-step="3" id="step-3">
-                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">restaurant</span> Indian Dietary Choices</h3>
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">restaurant</span> Indian Dietary Choices</h3>
                             <p class="step-desc">Food emissions differ drastically based on non-veg levels. Plant-based diets reduce footprints considerably.</p>
                             
                             <div class="form-grid">
@@ -241,7 +241,7 @@
                                         <label class="radio-card">
                                             <input type="radio" name="diet" value="pure-veg" checked>
                                             <div class="card-content">
-                                                <span class="material-symbols-rounded text-large">eco</span>
+                                                <span class="material-symbols-rounded text-large" aria-hidden="true">eco</span>
                                                 <h4>Pure Veg</h4>
                                                 <span>Vegetarian (Dairy, no eggs)</span>
                                             </div>
@@ -249,7 +249,7 @@
                                         <label class="radio-card">
                                             <input type="radio" name="diet" value="eggetarian">
                                             <div class="card-content">
-                                                <span class="material-symbols-rounded text-large">egg_alt</span>
+                                                <span class="material-symbols-rounded text-large" aria-hidden="true">egg_alt</span>
                                                 <h4>Eggetarian</h4>
                                                 <span>Veg plus egg products</span>
                                             </div>
@@ -257,7 +257,7 @@
                                         <label class="radio-card">
                                             <input type="radio" name="diet" value="non-veg">
                                             <div class="card-content">
-                                                <span class="material-symbols-rounded text-large">restaurant_menu</span>
+                                                <span class="material-symbols-rounded text-large" aria-hidden="true">restaurant_menu</span>
                                                 <h4>Non-Veg</h4>
                                                 <span>Chicken/Fish occasionally</span>
                                             </div>
@@ -265,7 +265,7 @@
                                         <label class="radio-card">
                                             <input type="radio" name="diet" value="heavy-meat">
                                             <div class="card-content">
-                                                <span class="material-symbols-rounded text-large">flatware</span>
+                                                <span class="material-symbols-rounded text-large" aria-hidden="true">flatware</span>
                                                 <h4>Heavy Meat</h4>
                                                 <span>Frequent meat / Beef / Mutton</span>
                                             </div>
@@ -293,7 +293,7 @@
 
                         <!-- STEP 4: CONSUMPTION -->
                         <div class="calc-step" data-step="4" id="step-4">
-                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">shopping_bag</span> Shopping & Waste</h3>
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align" aria-hidden="true">shopping_bag</span> Shopping & Waste</h3>
                             <p class="step-desc">Lifestyle choices, packaging, and sorting methods dictate this carbon fraction.</p>
                             
                             <div class="form-grid">
