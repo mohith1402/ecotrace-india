@@ -4,7 +4,7 @@
 
 ---
 
-## 🏆 Hackathon Persona & Submission Information
+##  Persona & Information
 
 - **Chosen Vertical**: Carbon Footprint Awareness Platform
 - **Codebase Size**: $< 1 \text{ MB}$ (Strictly complies with the $<10\text{ MB}$ hackathon limit)
@@ -65,7 +65,7 @@ Calculations are tailored specifically to Indian standards using EPA, DEFRA, and
 
 ---
 
-## 🛡️ Hackathon Submission Highlights
+## 🛡️ Highlights
 
 * **Code Security**: Fully sanitized against Cross-Site Scripting (XSS) script injections on both custom checklists and chatbot inputs using a secure sanitization layer.
 * **Accessibility (a11y)**: Built with native HTML5 semantic landmarks and custom `aria-hidden` attributes configured on all dynamic elements and decorative icons.
