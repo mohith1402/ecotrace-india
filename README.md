@@ -60,7 +60,7 @@ Calculations are tailored specifically to Indian standards using EPA, DEFRA, and
 
 ## 🔗 Live Deployed Link
 
-* **Deployed Cloud Run URL**: `[Insert your live Cloud Run HTTPS URL here]`
+* **Deployed Web Application URL**: `[Insert your live Deployed URL here (GitHub Pages or Streamlit)]`
 * **GitHub Repository**: Public Submission
 
 ---
