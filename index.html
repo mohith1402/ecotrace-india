@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoTrace India - Carbon Footprint Tracker & AI Advisor</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Google Material Symbols Rounded (Material 3 Icons) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Aurora Background Wavy Elements -->
+        <div class="aurora-container">
+            <div class="aurora-wave wave-1"></div>
+            <div class="aurora-wave wave-2"></div>
+            <div class="aurora-wave wave-3"></div>
+            <div class="aurora-wave wave-4"></div>
+        </div>
+
+        <!-- 1. LEFT SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-top">
+                <div class="logo-area">
+                    <div class="logo-brand">
+                        <span class="material-symbols-rounded fill-icon text-gradient-success">eco</span>
+                        <h2>EcoTrace</h2>
+                    </div>
+                    <!-- Theme Toggle Switch -->
+                    <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle Light/Dark Theme">
+                        <span class="material-symbols-rounded" id="theme-icon">light_mode</span>
+                    </button>
+                </div>
+                
+                <!-- Live Carbon Tracker Widget in Sidebar -->
+                <div class="sidebar-tracker-widget">
+                    <span class="widget-label">LIVE EMISSIONS</span>
+                    <div class="widget-value-area">
+                        <span class="widget-score" id="sidebar-live-score">0.00</span>
+                        <span class="widget-unit">t CO₂/yr</span>
+                    </div>
+                    <div class="widget-indicator success" id="sidebar-trend-indicator">
+                        <span class="material-symbols-rounded">check_circle</span>
+                        <span id="trend-text">Awaiting input</span>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="nav-menu">
+                    <button class="nav-menu-btn active" data-tab="calculator" id="tab-calculator">
+                        <span class="material-symbols-rounded">calculate</span>
+                        <span>Calculator</span>
+                    </button>
+                    <button class="nav-menu-btn" data-tab="dashboard" id="tab-dashboard">
+                        <span class="material-symbols-rounded">dashboard</span>
+                        <span>Dashboard</span>
+                    </button>
+                    <button class="nav-menu-btn" data-tab="tracker" id="tab-tracker">
+                        <span class="material-symbols-rounded">checklist</span>
+                        <span>Action Center</span>
+                    </button>
+                    <button class="nav-menu-btn" data-tab="simulator" id="tab-simulator">
+                        <span class="material-symbols-rounded">query_stats</span>
+                        <span>Simulator</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- User Level Status at Bottom of Sidebar -->
+            <div class="sidebar-footer">
+                <div class="sidebar-level-card">
+                    <div class="level-header">
+                        <span class="lvl-lbl">Eco Level</span>
+                        <span class="lvl-val" id="user-level">Seedling</span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div class="xp-bar-fill" id="xp-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="level-footer">
+                        <span class="xp-subtext" id="xp-text">0 / 100 XP</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Header Toggle Bar -->
+        <header class="mobile-header">
+            <div class="logo-area">
+                <span class="material-symbols-rounded fill-icon text-gradient-success">eco</span>
+                <h2>EcoTrace</h2>
+            </div>
+            <div class="mobile-menu-actions">
+                <div class="mobile-score-badge">
+                    <span id="mobile-live-score">0.00</span> t/yr
+                </div>
+                <!-- Mobile Theme Toggle -->
+                <button id="mobile-theme-toggle-btn" class="mobile-theme-btn" aria-label="Toggle Light/Dark Theme">
+                    <span class="material-symbols-rounded" id="mobile-theme-icon">light_mode</span>
+                </button>
+                <button id="mobile-menu-trigger" class="mobile-menu-btn">
+                    <span class="material-symbols-rounded">menu</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 2. RIGHT MAIN CONTENT PANEL -->
+        <main class="main-content">
+            <!-- CALCULATOR PANEL -->
+            <section class="panel active" id="panel-calculator">
+                <div class="panel-header">
+                    <h2>Emissions Calculator</h2>
+                    <p>Enter your daily routines, household energy, and food details. Your carbon score is recalculated in real-time as you type.</p>
+                </div>
+
+                <div class="glass-card calculator-card">
+                    <!-- Progress Header -->
+                    <div class="calc-progress-header">
+                        <div class="calc-step-indicators">
+                            <div class="step-indicator active" data-step="1">1<span class="step-tooltip">Travel</span></div>
+                            <div class="step-line"></div>
+                            <div class="step-indicator" data-step="2">2<span class="step-tooltip">Energy & LPG</span></div>
+                            <div class="step-line"></div>
+                            <div class="step-indicator" data-step="3">3<span class="step-tooltip">Diet</span></div>
+                            <div class="step-line"></div>
+                            <div class="step-indicator" data-step="4">4<span class="step-tooltip">Waste</span></div>
+                        </div>
+                    </div>
+
+                    <form id="footprint-form" onsubmit="event.preventDefault();">
+                        <!-- STEP 1: TRANSPORT -->
+                        <div class="calc-step active" data-step="1" id="step-1">
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">directions_car</span> Transportation</h3>
+                            <p class="step-desc">Specify your commute metrics. Private car driving, two-wheeler travel, and public transit comprise transport emissions.</p>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="car-distance">Annual Car Driving (km/year)</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="car-distance" min="0" placeholder="e.g. 5000" value="4000">
+                                        <span class="unit">km</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="car-fuel">Car Fuel Type</label>
+                                    <select id="car-fuel">
+                                        <option value="petrol">Petrol (Gasoline)</option>
+                                        <option value="diesel">Diesel</option>
+                                        <option value="cng">CNG (Compressed Natural Gas)</option>
+                                        <option value="hybrid">Hybrid</option>
+                                        <option value="ev">Electric Vehicle (EV)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bike-distance">Annual Two-Wheeler Commute (km/year)</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="bike-distance" min="0" placeholder="e.g. 3000" value="2500">
+                                        <span class="unit">km</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bike-fuel">Two-Wheeler Type</label>
+                                    <select id="bike-fuel">
+                                        <option value="petrol">Petrol (Scooter/Bike)</option>
+                                        <option value="ev">Electric Scooter (EV)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="transit-hours">Public Transport (Hours/Week - Metro/Local Bus)</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="transit-hours" min="0" placeholder="e.g. 6" value="4">
+                                        <span class="unit">hrs</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="flights-short">Domestic Flights (Per year)</label>
+                                    <input type="number" id="flights-short" min="0" placeholder="e.g. 1" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label for="flights-long">International Flights (Per year)</label>
+                                    <input type="number" id="flights-long" min="0" placeholder="e.g. 0" value="0">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 2: ENERGY -->
+                        <div class="calc-step" data-step="2" id="step-2">
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">bolt</span> Energy & LPG Cooking</h3>
+                            <p class="step-desc">Electricity carbon intensity varies by Indian regional grids. LPG cooking cylinders are also a key component.</p>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="electricity-bill">Monthly Electricity Bill (₹)</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="electricity-bill" min="0" placeholder="e.g. 2500" value="1800">
+                                        <span class="unit">₹</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="regional-grid">Regional Grid Area</label>
+                                    <select id="regional-grid">
+                                        <option value="west" selected>Western Grid (MH, GJ, MP, GOA)</option>
+                                        <option value="north">Northern Grid (DL, UP, HR, PB, RJ)</option>
+                                        <option value="south">Southern Grid (KA, TN, AP, TS, KL)</option>
+                                        <option value="east">Eastern Grid (WB, BH, OD, JH)</option>
+                                        <option value="northeast">North-Eastern Grid (AS, MN, ML)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group animate-toggle">
+                                    <label for="solar-energy">Do you have Solar Panels / Rooftop Solar?</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="solar-energy">
+                                        <label for="solar-energy" class="toggle-slider"></label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="lpg-cylinders">LPG Cylinders Consumed (per month, 14.2kg cylinders)</label>
+                                    <input type="number" id="lpg-cylinders" min="0" max="10" step="0.5" value="1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="household-members">Number of Household Members</label>
+                                    <input type="number" id="household-members" min="1" value="4">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: FOOD -->
+                        <div class="calc-step" data-step="3" id="step-3">
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">restaurant</span> Indian Dietary Choices</h3>
+                            <p class="step-desc">Food emissions differ drastically based on non-veg levels. Plant-based diets reduce footprints considerably.</p>
+                            
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label>Dietary Style</label>
+                                    <div class="radio-card-grid">
+                                        <label class="radio-card">
+                                            <input type="radio" name="diet" value="pure-veg" checked>
+                                            <div class="card-content">
+                                                <span class="material-symbols-rounded text-large">eco</span>
+                                                <h4>Pure Veg</h4>
+                                                <span>Vegetarian (Dairy, no eggs)</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-card">
+                                            <input type="radio" name="diet" value="eggetarian">
+                                            <div class="card-content">
+                                                <span class="material-symbols-rounded text-large">egg_alt</span>
+                                                <h4>Eggetarian</h4>
+                                                <span>Veg plus egg products</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-card">
+                                            <input type="radio" name="diet" value="non-veg">
+                                            <div class="card-content">
+                                                <span class="material-symbols-rounded text-large">restaurant_menu</span>
+                                                <h4>Non-Veg</h4>
+                                                <span>Chicken/Fish occasionally</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-card">
+                                            <input type="radio" name="diet" value="heavy-meat">
+                                            <div class="card-content">
+                                                <span class="material-symbols-rounded text-large">flatware</span>
+                                                <h4>Heavy Meat</h4>
+                                                <span>Frequent meat / Beef / Mutton</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="food-waste">Food Waste Habits</label>
+                                    <select id="food-waste">
+                                        <option value="none">Almost none / Compost wet waste</option>
+                                        <option value="normal" selected>Normal / Moderate waste</option>
+                                        <option value="high">Frequently throw out leftovers/spoiled vegetables</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="food-local">Do you buy local & seasonal produce (e.g. from local Sabzi Mandi)?</label>
+                                    <select id="food-local">
+                                        <option value="always" selected>Always / Mostly local Mandi</option>
+                                        <option value="sometimes">Sometimes / Mix of supermarkets & local</option>
+                                        <option value="rarely">Rarely / Prefer packaged or imported foods</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 4: CONSUMPTION -->
+                        <div class="calc-step" data-step="4" id="step-4">
+                            <h3><span class="material-symbols-rounded text-gradient-success vertical-align">shopping_bag</span> Shopping & Waste</h3>
+                            <p class="step-desc">Lifestyle choices, packaging, and sorting methods dictate this carbon fraction.</p>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="shopping-frequency">New Purchases Frequency (Tech updates, fast fashion)</label>
+                                    <select id="shopping-frequency">
+                                        <option value="frequent">Very Frequent (Regular shopping/gadget upgrades)</option>
+                                        <option value="average" selected>Average (Occasional purchases as needed)</option>
+                                        <option value="minimal">Minimal / Repairs and reuse prioritised</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="recycling-rate">Waste Segregation & Recycling</label>
+                                    <select id="recycling-rate">
+                                        <option value="all">Full segregation (Separate wet/dry, newspapers to Kabadiwala)</option>
+                                        <option value="some" selected>Some segregation (Mainly sell papers/bottles)</option>
+                                        <option value="none">No segregation (All mixed waste sent to landfill)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group animate-toggle">
+                                    <label for="single-use-plastic">Refuse Single-Use Plastics? (e.g. carry bag bans)</label>
+                                    <div class="toggle-switch">
+                                        <input type="checkbox" id="single-use-plastic" checked>
+                                        <label for="single-use-plastic" class="toggle-slider"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Footer -->
+                        <div class="calc-nav">
+                            <button type="button" class="btn btn-secondary btn-icon-left" id="btn-prev" disabled>
+                                <span class="material-symbols-rounded">arrow_back</span> Back
+                            </button>
+                            <button type="button" class="btn btn-primary btn-icon-right" id="btn-next">
+                                Next <span class="material-symbols-rounded">arrow_forward</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- DASHBOARD PANEL -->
+            <section class="panel" id="panel-dashboard">
+                <div class="panel-header">
+                    <h2>Footprint Analytics</h2>
+                    <p>Real-time analytics comparing your carbon footprint against Indian national benchmarks.</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Global Carbon Summary -->
+                    <div class="glass-card hero-card flex-center">
+                        <div class="score-display">
+                            <div class="gauge-container">
+                                <svg class="gauge-svg" viewBox="0 0 100 50">
+                                    <path class="gauge-bg" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#172232" stroke-width="8" stroke-linecap="round"></path>
+                                    <path class="gauge-value" id="gauge-path" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#gauge-gradient)" stroke-width="8" stroke-linecap="round" stroke-dasharray="125.6" stroke-dashoffset="125.6"></path>
+                                    
+                                    <defs>
+                                        <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#10b981" />
+                                            <stop offset="60%" stop-color="#34d399" />
+                                            <stop offset="100%" stop-color="#f43f5e" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                                <div class="gauge-text">
+                                    <span class="score-number" id="dashboard-total-score">0.00</span>
+                                    <span class="score-unit">Tonnes CO₂/yr</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="benchmark-info">
+                            <h3 id="benchmark-status">Awaiting calculation</h3>
+                            <p id="benchmark-comparison">Please complete the calculator first.</p>
+                        </div>
+                    </div>
+
+                    <!-- Category Breakdown (Chart.js) -->
+                    <div class="glass-card chart-card">
+                        <h3>Emissions Breakdown</h3>
+                        <div class="chart-container">
+                            <canvas id="breakdownChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Tree Offset Visualization Widget -->
+                    <div class="glass-card offset-trees-card">
+                        <h3>Forest Carbon Offset</h3>
+                        <div class="tree-offset-showcase">
+                            <div class="forest-visualization" id="forest-tree-container">
+                                <span class="material-symbols-rounded tree-icon fill-icon" id="primary-visual-tree">forest</span>
+                            </div>
+                            <div class="forest-stats">
+                                <h4 class="text-gradient-success"><span id="display-trees-count">0</span> Trees Required</h4>
+                                <p id="display-trees-desc">A single mature tree absorbs about 22 kg of CO₂ per year. This represents the size of the forest needed to offset your annual footprint.</p>
+                            </div>
+                        </div>
+                        <!-- Mini Forest Grid container for wrapping trees -->
+                        <div class="forest-grid" id="forest-grid"></div>
+                        
+                        <div class="savings-note" id="trees-saved-box" style="display: none; margin-top: 14px;">
+                            <span class="material-symbols-rounded">park</span>
+                            <span>Your Action Center savings equal **<span id="display-trees-saved">0</span> saplings** saved!</span>
+                        </div>
+                    </div>
+
+                    <!-- Unlocked Badges / Accomplishments -->
+                    <div class="glass-card achievements-card">
+                        <h3>Achievements & Badges</h3>
+                        <div class="badges-grid" id="badges-grid">
+                            <!-- Badges will be generated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TRACKER PANEL -->
+            <section class="panel" id="panel-tracker">
+                <div class="panel-header">
+                    <h2>Daily Action Center</h2>
+                    <p>Complete daily carbon reduction tasks, log actual savings, and gain XP to level up.</p>
+                </div>
+
+                <div class="tracker-layout">
+                    <!-- Lifetime Offset Stats -->
+                    <div class="glass-card offset-stats-card flex-row">
+                        <div class="stat-item">
+                            <span class="material-symbols-rounded text-large text-gradient-success fill-icon">public</span>
+                            <div>
+                                <span class="stat-number" id="stats-lifetime-saved">0.0</span>
+                                <span class="stat-label">Total CO₂ Saved (kg)</span>
+                            </div>
+                        </div>
+                        <div class="stat-item border-left">
+                            <span class="material-symbols-rounded text-large text-gradient-success fill-icon">military_tech</span>
+                            <div>
+                                <span class="stat-number" id="stats-total-xp">0</span>
+                                <span class="stat-label">Total XP Earned</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Habit Checklist Category Filters -->
+                    <div class="tracker-grid">
+                        <div class="glass-card habits-card">
+                            <div class="habits-header">
+                                <h3>Sustainability Tasks</h3>
+                                <div class="filter-buttons">
+                                    <button class="filter-btn active" data-filter="all">All</button>
+                                    <button class="filter-btn" data-filter="transport">Travel</button>
+                                    <button class="filter-btn" data-filter="energy">Energy</button>
+                                    <button class="filter-btn" data-filter="food">Food</button>
+                                </div>
+                            </div>
+                            
+                            <div class="habit-list" id="habit-list-container">
+                                <!-- Dynamic habit list items generated by app.js -->
+                            </div>
+                        </div>
+
+                        <!-- Custom Habit Creator -->
+                        <div class="glass-card custom-habit-card">
+                            <h3>Add Custom Action</h3>
+                            <p>Commit to a personal carbon saving goal and define its impact.</p>
+                            <form id="custom-habit-form" onsubmit="event.preventDefault();">
+                                <div class="form-group">
+                                    <label for="custom-habit-title">Action Title</label>
+                                    <input type="text" id="custom-habit-title" required placeholder="e.g. Turn off geyser immediately after use">
+                                </div>
+                                <div class="form-group">
+                                    <label for="custom-habit-co2">Estimated CO₂ Offset (kg/day)</label>
+                                    <div class="input-with-unit">
+                                        <input type="number" id="custom-habit-co2" step="0.1" min="0.1" max="100" required value="1.0">
+                                        <span class="unit">kg</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="custom-habit-category">Category</label>
+                                    <select id="custom-habit-category">
+                                        <option value="transport">Transportation</option>
+                                        <option value="energy">Home Energy</option>
+                                        <option value="food">Diet & Food</option>
+                                        <option value="consumption">Waste & Consumption</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <span class="material-symbols-rounded">add</span> Add Action
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SIMULATOR PANEL -->
+            <section class="panel" id="panel-simulator">
+                <div class="panel-header">
+                    <h2>Net-Zero Simulator</h2>
+                    <p>Model custom changes in your energy, travel, and food profiles to project a 5-year pathway to carbon neutrality.</p>
+                </div>
+
+                <div class="simulator-layout">
+                    <!-- Left Side: Sliders for habit changes -->
+                    <div class="glass-card simulator-controls">
+                        <h3>Simulation Controls</h3>
+                        <p class="section-sub">Tweak standard habits to project how carbon profiles contract over time.</p>
+                        
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">commute</span> Reduce Driving (Car/Bike)</span>
+                                <span class="slider-value" id="sim-car-val">0%</span>
+                            </div>
+                            <input type="range" id="sim-car" min="0" max="100" value="0" class="sim-slider">
+                            <span class="slider-desc">Walk, bike, use metro, or pool commutes.</span>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">solar_power</span> Switch to Clean Power</span>
+                                <span class="slider-value" id="sim-energy-val">0%</span>
+                            </div>
+                            <input type="range" id="sim-energy" min="0" max="100" value="0" class="sim-slider">
+                            <span class="slider-desc">Integrate solar panels or implement star-rated power efficient appliances.</span>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">potted_plant</span> Plant-Based Diet Adoption</span>
+                                <span class="slider-value" id="sim-food-val">0%</span>
+                            </div>
+                            <input type="range" id="sim-food" min="0" max="100" value="0" class="sim-slider">
+                            <span class="slider-desc">Move towards plant-based meals, regional Mandi items, and minimize food waste.</span>
+                        </div>
+
+                        <div class="slider-group">
+                            <div class="slider-header">
+                                <span><span class="material-symbols-rounded text-gradient-success vertical-align">delete_sweep</span> Waste Minimization</span>
+                                <span class="slider-value" id="sim-waste-val">0%</span>
+                            </div>
+                            <input type="range" id="sim-waste" min="0" max="100" value="0" class="sim-slider">
+                            <span class="slider-desc">Complete segregation, selling recyclables to Kabadiwala, and zero plastics.</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Side: Projection Line Chart -->
+                    <div class="glass-card simulator-chart-card">
+                        <h3>5-Year Projection Pathway</h3>
+                        <div class="chart-container large">
+                            <canvas id="projectionChart"></canvas>
+                        </div>
+                        <div class="projection-footer-metrics">
+                            <div class="sim-metric">
+                                <span class="metric-lbl">Current Footprint</span>
+                                <span class="metric-val" id="sim-current-val">0.00 t</span>
+                            </div>
+                            <div class="sim-arrow"><span class="material-symbols-rounded">arrow_forward</span></div>
+                            <div class="sim-metric text-success">
+                                <span class="metric-lbl">Year 5 Target</span>
+                                <span class="metric-val" id="sim-target-val">0.00 t</span>
+                            </div>
+                            <div class="sim-arrow"><span class="material-symbols-rounded">arrow_forward</span></div>
+                            <div class="sim-metric text-info">
+                                <span class="metric-lbl">Emissions Reduction</span>
+                                <span class="metric-val" id="sim-reduction-val">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Achievements / Level Up Modal Popup -->
+    <div class="modal-overlay" id="modal-level-up">
+        <div class="glass-card modal-card animate-zoom">
+            <div class="modal-icon-badge">
+                <span class="material-symbols-rounded text-large fill-icon">military_tech</span>
+            </div>
+            <h2>Level Up!</h2>
+            <p>Outstanding! Your carbon-saving habits have unlocked a new rank.</p>
+            <h3 class="new-level-display text-gradient-success" id="modal-level-name">Sprout</h3>
+            <button class="btn btn-primary" id="btn-close-modal">Continue Journey</button>
+        </div>
+    </div>
+
+    <!-- EcoBuddy Chat Widget UI -->
+    <button id="chat-trigger-btn" class="chat-trigger-btn">
+        <span class="material-symbols-rounded fill-icon">smart_toy</span>
+        <span class="chat-badge" id="chat-badge" style="display: none;">1</span>
+    </button>
+
+    <div class="chat-window-container" id="chat-window">
+        <div class="chat-header">
+            <div class="chat-title-area">
+                <span class="material-symbols-rounded text-gradient-success fill-icon">smart_toy</span>
+                <div>
+                    <h3>EcoBuddy</h3>
+                    <span class="chat-status"><span class="status-dot"></span> Reading context</span>
+                </div>
+            </div>
+            <button id="chat-close-btn" class="chat-close-btn">
+                <span class="material-symbols-rounded">close</span>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chat-messages-container">
+            <div class="chat-bubble bot">
+                Namaste! I am EcoBuddy, your smart AI advisor. I have loaded your regional profile, calculation history, and local checklist status. How can I assist you with your carbon-saving goals today?
+            </div>
+        </div>
+
+        <div class="chat-suggestions">
+            <button class="suggestion-chip" data-query="Analyze my footprint">Analyze my footprint</button>
+            <button class="suggestion-chip" data-query="Suggest a daily checklist">Suggest a checklist</button>
+            <button class="suggestion-chip" data-query="Is my energy footprint high?">Is my energy high?</button>
+            <button class="suggestion-chip" data-query="How do I reach Level 3?">How to reach Level 3?</button>
+        </div>
+
+        <form id="chat-input-form" class="chat-input-area" onsubmit="event.preventDefault();">
+            <input type="text" id="chat-input-field" placeholder="Ask EcoBuddy about your emissions..." autocomplete="off">
+            <button type="submit" id="chat-send-btn" class="chat-send-btn">
+                <span class="material-symbols-rounded">send</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Script loading -->
+    <script src="app.js"></script>
+</body>
+</html>

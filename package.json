@@ -1,0 +1,21 @@
+{
+  "name": "ecotrace",
+  "private": true,
+  "version": "1.0.0",
+  "description": "EcoTrace India - Carbon Footprint Tracker & Reduction Platform",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test.js",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0"
+  }
+}
