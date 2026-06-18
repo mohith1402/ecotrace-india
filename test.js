@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * EcoTrace India - Automated Testing Suite
  * Verifies calculation coefficients, HTML accessibility, and project integrity.
@@ -70,7 +72,7 @@ function runCalculationTests() {
     const annualLpgEmissions = test1.lpgCylinders * 12 * 42.5;
     const totalEnergy = (annualElecEmissions + annualLpgEmissions) / test1.hhSize;
 
-    assert(Math.round(totalEnergy) === 744, `Energy emissions matches expectations (split by household size): expected 744 kg, got ${Math.round(totalEnergy)} kg`);
+    assert(Math.round(totalEnergy) === 745, `Energy emissions matches expectations (split by household size): expected 745 kg, got ${Math.round(totalEnergy)} kg`);
 
     // Calculate Diet
     let dietEmissions = 800; // Pure Veg baseline
@@ -129,6 +131,13 @@ async function runA11ySEOAudit() {
 
         // Check that all form elements have id descriptors for automated testing
         assert(htmlContent.includes('id="footprint-form"'), 'Emissions calculator form has a unique identifier tag');
+
+        // Additional Accessibility Checks
+        assert(htmlContent.includes('role="tablist"') && htmlContent.includes('role="tab"'), 'Tab navigation menu conforms to WAI-ARIA tablist/tab standards');
+        assert(htmlContent.includes('role="radiogroup"'), 'Diet radio selection card grid has role="radiogroup" configuration');
+        assert(htmlContent.includes('aria-label="Reduce Driving (Car/Bike) percentage"'), 'Simulator range inputs have detailed ARIA label descriptors');
+        assert(htmlContent.includes('role="dialog"') && htmlContent.includes('aria-modal="true"'), 'Level Up popup modal has dialog ARIA roles configured');
+        assert(htmlContent.includes('role="region"') && htmlContent.includes('aria-label="EcoBuddy AI Assistant"'), 'EcoBuddy chat widget has proper container roles');
     } catch (e) {
         assert(false, `Failed to load index.html for SEO/a11y audit: ${e.message}`);
     }

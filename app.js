@@ -1,6 +1,41 @@
+"use strict";
+
 /* ==========================================================================
    EcoTrace India Core Logic - Theme Switcher, Aurora Grid, Real-Time Calculations
    ========================================================================== */
+
+// --- Safe DOM Access Helpers ---
+function safeSetText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+    return el;
+}
+
+function safeSetHTML(id, html) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = html;
+    return el;
+}
+
+function safeGetValue(id, defaultValue = "") {
+    const el = document.getElementById(id);
+    return el ? el.value : defaultValue;
+}
+
+function safeGetFloat(id, defaultValue = 0) {
+    const el = document.getElementById(id);
+    return el ? parseFloat(el.value) || defaultValue : defaultValue;
+}
+
+function safeGetInt(id, defaultValue = 0) {
+    const el = document.getElementById(id);
+    return el ? parseInt(el.value, 10) || defaultValue : defaultValue;
+}
+
+function safeGetChecked(id, defaultValue = false) {
+    const el = document.getElementById(id);
+    return el ? el.checked : defaultValue;
+}
 
 // --- Game and Level Configurations ---
 const ECO_LEVELS = [
@@ -117,8 +152,8 @@ function setupThemeToggler() {
         
         // Update both button icons
         const iconName = isLight ? "dark_mode" : "light_mode";
-        document.getElementById("theme-icon").textContent = iconName;
-        document.getElementById("mobile-theme-icon").textContent = iconName;
+        safeSetText("theme-icon", iconName);
+        safeSetText("mobile-theme-icon", iconName);
         
         // Refresh dynamic colors for Chart.js
         updateChartThemeColors(isLight);
@@ -130,17 +165,15 @@ function setupThemeToggler() {
 
 function loadTheme() {
     const savedTheme = localStorage.getItem("ecotrace_theme");
-    const themeBtnIcon = document.getElementById("theme-icon");
-    const mobileThemeIcon = document.getElementById("mobile-theme-icon");
     
     if (savedTheme === "light") {
         document.body.classList.add("light-theme");
-        if (themeBtnIcon) themeBtnIcon.textContent = "dark_mode";
-        if (mobileThemeIcon) mobileThemeIcon.textContent = "dark_mode";
+        safeSetText("theme-icon", "dark_mode");
+        safeSetText("mobile-theme-icon", "dark_mode");
     } else {
         document.body.classList.remove("light-theme");
-        if (themeBtnIcon) themeBtnIcon.textContent = "light_mode";
-        if (mobileThemeIcon) mobileThemeIcon.textContent = "light_mode";
+        safeSetText("theme-icon", "light_mode");
+        safeSetText("mobile-theme-icon", "light_mode");
     }
 }
 
@@ -174,19 +207,30 @@ function setupNavigation() {
         btn.addEventListener("click", () => {
             const targetTab = btn.getAttribute("data-tab");
             
-            navButtons.forEach(b => b.classList.remove("active"));
+            navButtons.forEach(b => {
+                b.classList.remove("active");
+                b.setAttribute("aria-selected", "false");
+            });
             panels.forEach(p => p.classList.remove("active"));
             
             btn.classList.add("active");
+            btn.setAttribute("aria-selected", "true");
             
             const targetPanel = document.getElementById(`panel-${targetTab}`);
-            targetPanel.classList.add("active");
+            if (targetPanel) {
+                targetPanel.classList.add("active");
+            }
             
             // Auto scroll main panel on navigation transitions
-            document.querySelector(".main-content").scrollTop = 0;
+            const mainContent = document.querySelector(".main-content");
+            if (mainContent) {
+                mainContent.scrollTop = 0;
+            }
             
             // Close mobile sidebar menu drawer if active
-            sidebar.classList.remove("active");
+            if (sidebar) {
+                sidebar.classList.remove("active");
+            }
             
             // Refresh charts upon tab change
             if (targetTab === "dashboard") {
@@ -198,7 +242,7 @@ function setupNavigation() {
     });
 
     // Mobile menu drawer toggle
-    if (menuTrigger) {
+    if (menuTrigger && sidebar) {
         menuTrigger.addEventListener("click", () => {
             sidebar.classList.toggle("active");
         });
@@ -343,13 +387,13 @@ function setupCalculator() {
 
 function calculateFootprint(isAuto = false) {
     // --- Step 1: Transport ---
-    const carDist = parseFloat(document.getElementById("car-distance").value) || 0;
-    const carFuel = document.getElementById("car-fuel").value;
-    const bikeDist = parseFloat(document.getElementById("bike-distance").value) || 0;
-    const bikeFuel = document.getElementById("bike-fuel").value;
-    const transitHrs = parseFloat(document.getElementById("transit-hours").value) || 0;
-    const flightsShort = parseInt(document.getElementById("flights-short").value) || 0;
-    const flightsLong = parseInt(document.getElementById("flights-long").value) || 0;
+    const carDist = safeGetFloat("car-distance", 0);
+    const carFuel = safeGetValue("car-fuel", "petrol");
+    const bikeDist = safeGetFloat("bike-distance", 0);
+    const bikeFuel = safeGetValue("bike-fuel", "petrol");
+    const transitHrs = safeGetFloat("transit-hours", 0);
+    const flightsShort = safeGetInt("flights-short", 0);
+    const flightsLong = safeGetInt("flights-long", 0);
     
     const carFuelCoeffs = { petrol: 0.18, diesel: 0.17, cng: 0.12, hybrid: 0.11, ev: 0.05 };
     const bikeFuelCoeffs = { petrol: 0.05, ev: 0.015 };
@@ -361,11 +405,11 @@ function calculateFootprint(isAuto = false) {
     const totalTransport = carEmissions + bikeEmissions + transitEmissions + flightEmissions;
 
     // --- Step 2: Energy & LPG ---
-    const elecBill = parseFloat(document.getElementById("electricity-bill").value) || 0;
-    const regionalGrid = document.getElementById("regional-grid").value;
-    const hasSolar = document.getElementById("solar-energy").checked;
-    const lpgCylinders = parseFloat(document.getElementById("lpg-cylinders").value) || 0;
-    const hhSize = parseInt(document.getElementById("household-members").value) || 1;
+    const elecBill = safeGetFloat("electricity-bill", 0);
+    const regionalGrid = safeGetValue("regional-grid", "west");
+    const hasSolar = safeGetChecked("solar-energy", false);
+    const lpgCylinders = safeGetFloat("lpg-cylinders", 0);
+    const hhSize = safeGetInt("household-members", 1);
     
     const monthlyKwh = elecBill / 7.0; // ₹7 average tariff per unit
     const gridCoeffs = { south: 0.72, north: 0.82, west: 0.80, east: 0.89, northeast: 0.35 };
@@ -382,8 +426,8 @@ function calculateFootprint(isAuto = false) {
     // --- Step 3: Diet & Food ---
     const dietRadio = document.querySelector('input[name="diet"]:checked');
     const dietType = dietRadio ? dietRadio.value : "pure-veg";
-    const foodWaste = document.getElementById("food-waste").value;
-    const foodLocal = document.getElementById("food-local").value;
+    const foodWaste = safeGetValue("food-waste", "normal");
+    const foodLocal = safeGetValue("food-local", "always");
     
     let dietEmissions = 1200;
     if (dietType === "pure-veg") dietEmissions = 800;
@@ -400,9 +444,9 @@ function calculateFootprint(isAuto = false) {
     const totalFood = dietEmissions;
 
     // --- Step 4: Consumption & Shopping ---
-    const shopFreq = document.getElementById("shopping-frequency").value;
-    const recycleRate = document.getElementById("recycling-rate").value;
-    const avoidPlastics = document.getElementById("single-use-plastic").checked;
+    const shopFreq = safeGetValue("shopping-frequency", "average");
+    const recycleRate = safeGetValue("recycling-rate", "some");
+    const avoidPlastics = safeGetChecked("single-use-plastic", false);
     
     let consEmissions = 500;
     if (shopFreq === "frequent") consEmissions = 1000;
@@ -436,36 +480,36 @@ function updateLiveMetrics() {
     const total = state.calculatorResults.total;
     
     // Update Sidebar & Mobile Header totals
-    document.getElementById("sidebar-live-score").textContent = total.toFixed(2);
-    document.getElementById("mobile-live-score").textContent = total.toFixed(2);
+    safeSetText("sidebar-live-score", total.toFixed(2));
+    safeSetText("mobile-live-score", total.toFixed(2));
     
     // Live trend indicator details
     const trendInd = document.getElementById("sidebar-trend-indicator");
     const trendTxt = document.getElementById("trend-text");
     
-    if (total === 0) {
-        trendInd.className = "widget-indicator";
-        trendTxt.textContent = "Awaiting input";
-        trendInd.querySelector("span").textContent = "help";
-    } else if (total < 1.5) {
-        trendInd.className = "widget-indicator success";
-        trendTxt.textContent = "Sustainable level";
-        trendInd.querySelector("span").textContent = "check_circle";
-    } else if (total <= 2.5) {
-        trendInd.className = "widget-indicator warning";
-        trendTxt.textContent = "Close to national avg";
-        trendInd.querySelector("span").textContent = "info";
-    } else {
-        trendInd.className = "widget-indicator danger";
-        trendTxt.textContent = "Above national avg";
-        trendInd.querySelector("span").textContent = "warning";
+    if (trendInd && trendTxt) {
+        const span = trendInd.querySelector("span");
+        if (total === 0) {
+            trendInd.className = "widget-indicator";
+            trendTxt.textContent = "Awaiting input";
+            if (span) span.textContent = "help";
+        } else if (total < 1.5) {
+            trendInd.className = "widget-indicator success";
+            trendTxt.textContent = "Sustainable level";
+            if (span) span.textContent = "check_circle";
+        } else if (total <= 2.5) {
+            trendInd.className = "widget-indicator warning";
+            trendTxt.textContent = "Close to national avg";
+            if (span) span.textContent = "info";
+        } else {
+            trendInd.className = "widget-indicator danger";
+            trendTxt.textContent = "Above national avg";
+            if (span) span.textContent = "warning";
+        }
     }
 
     // Update Dashboard numerical score gauge
-    const dashboardScore = document.getElementById("dashboard-total-score");
-    if (dashboardScore) {
-        dashboardScore.textContent = total.toFixed(2);
-    }
+    safeSetText("dashboard-total-score", total.toFixed(2));
     
     const gaugePath = document.getElementById("gauge-path");
     if (gaugePath) {
@@ -476,22 +520,21 @@ function updateLiveMetrics() {
     // Dynamic Tree calculations
     // 1 mature tree absorbs ~22 kg CO2/year
     const treesNeeded = Math.ceil((total * 1000) / 22);
-    const displayCount = document.getElementById("display-trees-count");
-    if (displayCount) {
-        displayCount.textContent = treesNeeded;
-    }
+    safeSetText("display-trees-count", treesNeeded);
 
     // RESOLVED UI BUG: Draw ONE clean, pulsing forest icon inside the circle badge
     const treeBadgeContainer = document.getElementById("forest-tree-container");
     if (treeBadgeContainer) {
         treeBadgeContainer.innerHTML = `<span class="material-symbols-rounded tree-icon fill-icon" aria-hidden="true">forest</span>`;
         const iconSpan = treeBadgeContainer.querySelector("span");
-        if (total < 1.5) {
-            iconSpan.style.color = "var(--color-primary)";
-        } else if (total <= 2.5) {
-            iconSpan.style.color = "var(--color-warning)";
-        } else {
-            iconSpan.style.color = "var(--color-danger)";
+        if (iconSpan) {
+            if (total < 1.5) {
+                iconSpan.style.color = "var(--color-primary)";
+            } else if (total <= 2.5) {
+                iconSpan.style.color = "var(--color-warning)";
+            } else {
+                iconSpan.style.color = "var(--color-danger)";
+            }
         }
     }
 
@@ -640,6 +683,9 @@ function renderHabits(filter = "all") {
         const isCompleted = !!state.completedHabits[habit.id];
         const habitDiv = document.createElement("div");
         habitDiv.className = `habit-item ${isCompleted ? "completed" : ""}`;
+        habitDiv.setAttribute("role", "checkbox");
+        habitDiv.setAttribute("aria-checked", isCompleted ? "true" : "false");
+        habitDiv.setAttribute("tabindex", "0");
         
         const catIcons = { transport: "directions_car", energy: "bolt", food: "restaurant", consumption: "shopping_bag" };
         const catIcon = catIcons[habit.category] || "eco";
@@ -665,6 +711,13 @@ function renderHabits(filter = "all") {
         
         habitDiv.addEventListener("click", () => {
             toggleHabit(habit);
+        });
+        
+        habitDiv.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleHabit(habit);
+            }
         });
         
         container.appendChild(habitDiv);
@@ -741,9 +794,9 @@ function updateSimulationPathway() {
     const year5Total = dataPoints[4];
     const reductionPercent = baseTotal > 0 ? Math.round(((baseTotal - year5Total) / baseTotal) * 100) : 0;
 
-    document.getElementById("sim-current-val").textContent = baseTotal.toFixed(2) + " t";
-    document.getElementById("sim-target-val").textContent = year5Total.toFixed(2) + " t";
-    document.getElementById("sim-reduction-val").textContent = reductionPercent + "%";
+    safeSetText("sim-current-val", baseTotal.toFixed(2) + " t");
+    safeSetText("sim-target-val", year5Total.toFixed(2) + " t");
+    safeSetText("sim-reduction-val", reductionPercent + "%");
 
     if (projectionChart) {
         projectionChart.data.datasets[0].data = dataPoints;
@@ -757,10 +810,13 @@ function updateUIElements() {
     const currLvl = ECO_LEVELS[lvlIndex];
     
     // Sidebar level bindings
-    document.getElementById("user-level").textContent = currLvl.name;
+    safeSetText("user-level", currLvl.name);
     const xpPercent = currLvl.maxXp === Infinity ? 100 : Math.round(((state.xp - currLvl.minXp) / (currLvl.maxXp - currLvl.minXp)) * 100);
-    document.getElementById("xp-fill").style.width = xpPercent + "%";
-    document.getElementById("xp-text").textContent = currLvl.maxXp === Infinity ? `${state.xp} XP` : `${state.xp - currLvl.minXp} / ${currLvl.maxXp - currLvl.minXp} XP`;
+    const xpFill = document.getElementById("xp-fill");
+    if (xpFill) {
+        xpFill.style.width = xpPercent + "%";
+    }
+    safeSetText("xp-text", currLvl.maxXp === Infinity ? `${state.xp} XP` : `${state.xp - currLvl.minXp} / ${currLvl.maxXp - currLvl.minXp} XP`);
 
     // Achievements Badge Rendering
     const badgesGrid = document.getElementById("badges-grid");
@@ -782,10 +838,11 @@ function updateUIElements() {
     }
 
     // Tracker UI stats updates
-    document.getElementById("stats-lifetime-saved").textContent = state.lifetimeSaved.toFixed(1);
-    document.getElementById("stats-total-xp").textContent = state.xp;
+    safeSetText("stats-lifetime-saved", state.lifetimeSaved.toFixed(1));
+    safeSetText("stats-total-xp", state.xp);
     
-    renderHabits(document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "all");
+    const activeFilterBtn = document.querySelector(".filter-btn.active");
+    renderHabits(activeFilterBtn ? activeFilterBtn.getAttribute("data-filter") : "all");
 }
 
 // --- Chart.js Integration System ---

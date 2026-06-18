@@ -52,20 +52,20 @@
                 </div>
 
                 <!-- Navigation Tabs -->
-                <nav class="nav-menu">
-                    <button class="nav-menu-btn active" data-tab="calculator" id="tab-calculator">
+                <nav class="nav-menu" role="tablist" aria-label="Main Navigation">
+                    <button class="nav-menu-btn active" data-tab="calculator" id="tab-calculator" role="tab" aria-selected="true">
                         <span class="material-symbols-rounded">calculate</span>
                         <span>Calculator</span>
                     </button>
-                    <button class="nav-menu-btn" data-tab="dashboard" id="tab-dashboard">
+                    <button class="nav-menu-btn" data-tab="dashboard" id="tab-dashboard" role="tab" aria-selected="false">
                         <span class="material-symbols-rounded">dashboard</span>
                         <span>Dashboard</span>
                     </button>
-                    <button class="nav-menu-btn" data-tab="tracker" id="tab-tracker">
+                    <button class="nav-menu-btn" data-tab="tracker" id="tab-tracker" role="tab" aria-selected="false">
                         <span class="material-symbols-rounded">checklist</span>
                         <span>Action Center</span>
                     </button>
-                    <button class="nav-menu-btn" data-tab="simulator" id="tab-simulator">
+                    <button class="nav-menu-btn" data-tab="simulator" id="tab-simulator" role="tab" aria-selected="false">
                         <span class="material-symbols-rounded">query_stats</span>
                         <span>Simulator</span>
                     </button>
@@ -103,7 +103,7 @@
                 <button id="mobile-theme-toggle-btn" class="mobile-theme-btn" aria-label="Toggle Light/Dark Theme">
                     <span class="material-symbols-rounded" id="mobile-theme-icon">light_mode</span>
                 </button>
-                <button id="mobile-menu-trigger" class="mobile-menu-btn">
+                <button id="mobile-menu-trigger" class="mobile-menu-btn" aria-label="Open navigation menu">
                     <span class="material-symbols-rounded">menu</span>
                 </button>
             </div>
@@ -236,8 +236,8 @@
                             
                             <div class="form-grid">
                                 <div class="form-group full-width">
-                                    <label>Dietary Style</label>
-                                    <div class="radio-card-grid">
+                                    <label id="diet-group-label">Dietary Style</label>
+                                    <div class="radio-card-grid" role="radiogroup" aria-labelledby="diet-group-label">
                                         <label class="radio-card">
                                             <input type="radio" name="diet" value="pure-veg" checked>
                                             <div class="card-content">
@@ -507,7 +507,7 @@
                                 <span><span class="material-symbols-rounded text-gradient-success vertical-align">commute</span> Reduce Driving (Car/Bike)</span>
                                 <span class="slider-value" id="sim-car-val">0%</span>
                             </div>
-                            <input type="range" id="sim-car" min="0" max="100" value="0" class="sim-slider">
+                            <input type="range" id="sim-car" min="0" max="100" value="0" class="sim-slider" aria-label="Reduce Driving (Car/Bike) percentage">
                             <span class="slider-desc">Walk, bike, use metro, or pool commutes.</span>
                         </div>
 
@@ -516,7 +516,7 @@
                                 <span><span class="material-symbols-rounded text-gradient-success vertical-align">solar_power</span> Switch to Clean Power</span>
                                 <span class="slider-value" id="sim-energy-val">0%</span>
                             </div>
-                            <input type="range" id="sim-energy" min="0" max="100" value="0" class="sim-slider">
+                            <input type="range" id="sim-energy" min="0" max="100" value="0" class="sim-slider" aria-label="Switch to Clean Power percentage">
                             <span class="slider-desc">Integrate solar panels or implement star-rated power efficient appliances.</span>
                         </div>
 
@@ -525,7 +525,7 @@
                                 <span><span class="material-symbols-rounded text-gradient-success vertical-align">potted_plant</span> Plant-Based Diet Adoption</span>
                                 <span class="slider-value" id="sim-food-val">0%</span>
                             </div>
-                            <input type="range" id="sim-food" min="0" max="100" value="0" class="sim-slider">
+                            <input type="range" id="sim-food" min="0" max="100" value="0" class="sim-slider" aria-label="Plant-Based Diet Adoption percentage">
                             <span class="slider-desc">Move towards plant-based meals, regional Mandi items, and minimize food waste.</span>
                         </div>
 
@@ -534,7 +534,7 @@
                                 <span><span class="material-symbols-rounded text-gradient-success vertical-align">delete_sweep</span> Waste Minimization</span>
                                 <span class="slider-value" id="sim-waste-val">0%</span>
                             </div>
-                            <input type="range" id="sim-waste" min="0" max="100" value="0" class="sim-slider">
+                            <input type="range" id="sim-waste" min="0" max="100" value="0" class="sim-slider" aria-label="Waste Minimization percentage">
                             <span class="slider-desc">Complete segregation, selling recyclables to Kabadiwala, and zero plastics.</span>
                         </div>
                     </div>
@@ -569,11 +569,11 @@
 
     <!-- Achievements / Level Up Modal Popup -->
     <div class="modal-overlay" id="modal-level-up">
-        <div class="glass-card modal-card animate-zoom">
+        <div class="glass-card modal-card animate-zoom" role="dialog" aria-modal="true" aria-labelledby="modal-title">
             <div class="modal-icon-badge">
                 <span class="material-symbols-rounded text-large fill-icon">military_tech</span>
             </div>
-            <h2>Level Up!</h2>
+            <h2 id="modal-title">Level Up!</h2>
             <p>Outstanding! Your carbon-saving habits have unlocked a new rank.</p>
             <h3 class="new-level-display text-gradient-success" id="modal-level-name">Sprout</h3>
             <button class="btn btn-primary" id="btn-close-modal">Continue Journey</button>
@@ -581,12 +581,12 @@
     </div>
 
     <!-- EcoBuddy Chat Widget UI -->
-    <button id="chat-trigger-btn" class="chat-trigger-btn">
+    <button id="chat-trigger-btn" class="chat-trigger-btn" aria-label="Open EcoBuddy Chatbot">
         <span class="material-symbols-rounded fill-icon">smart_toy</span>
         <span class="chat-badge" id="chat-badge" style="display: none;">1</span>
     </button>
 
-    <div class="chat-window-container" id="chat-window">
+    <div class="chat-window-container" id="chat-window" role="region" aria-label="EcoBuddy AI Assistant">
         <div class="chat-header">
             <div class="chat-title-area">
                 <span class="material-symbols-rounded text-gradient-success fill-icon">smart_toy</span>
@@ -595,7 +595,7 @@
                     <span class="chat-status"><span class="status-dot"></span> Reading context</span>
                 </div>
             </div>
-            <button id="chat-close-btn" class="chat-close-btn">
+            <button id="chat-close-btn" class="chat-close-btn" aria-label="Close Chat">
                 <span class="material-symbols-rounded">close</span>
             </button>
         </div>
@@ -614,8 +614,8 @@
         </div>
 
         <form id="chat-input-form" class="chat-input-area" onsubmit="event.preventDefault();">
-            <input type="text" id="chat-input-field" placeholder="Ask EcoBuddy about your emissions..." autocomplete="off">
-            <button type="submit" id="chat-send-btn" class="chat-send-btn">
+            <input type="text" id="chat-input-field" placeholder="Ask EcoBuddy about your emissions..." autocomplete="off" aria-label="EcoBuddy message input">
+            <button type="submit" id="chat-send-btn" class="chat-send-btn" aria-label="Send message">
                 <span class="material-symbols-rounded">send</span>
             </button>
         </form>
