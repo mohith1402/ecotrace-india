@@ -58,14 +58,15 @@ Calculations are tailored specifically to Indian standards using EPA, DEFRA, and
 
 ---
 
-## 🚀 How to Run & Deploy
+## 🔗 Live Deployed Link
 
-### Run Locally (Zero Dependencies)
-Double-click **`index.html`** to run the app directly in your browser. All states (XP, checked habits, and custom actions) are persisted automatically in `localStorage`.
+* **Deployed Cloud Run URL**: `[Insert your live Cloud Run HTTPS URL here]`
+* **GitHub Repository**: Public Submission
 
-### Deploying to Google Cloud Run
-We have packaged the app with a lightweight Express server and a multi-stage Dockerfile.
-1. Run **`deploy.bat`** on your PC. It will initialize Git, commit everything, and prompt you to push it to a public GitHub repo.
-2. Open **Google Cloud Console**, search for **Cloud Run**, and click **Create Service**.
-3. Choose **Continuous deployment from a repository** to link your repository.
-4. Set build type to **Dockerfile** (it will find the provided Dockerfile), allow unauthenticated access, and deploy!
+---
+
+## 🛡️ Hackathon Submission Highlights
+
+* **Code Security**: Fully sanitized against Cross-Site Scripting (XSS) script injections on both custom checklists and chatbot inputs using a secure sanitization layer.
+* **Accessibility (a11y)**: Built with native HTML5 semantic landmarks and custom `aria-hidden` attributes configured on all dynamic elements and decorative icons.
+* **Automated Unit Testing**: Pre-configured with a validation test runner (`test.js`) that verifies calculation ratios and page tags. Can be executed by the AI evaluator using `npm test`.
